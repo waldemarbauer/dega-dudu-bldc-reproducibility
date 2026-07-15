@@ -3,6 +3,7 @@ message: "If you use this software, please cite the accompanying manuscript and 
 title: "DEGA DUDU-BLDC reproducibility code"
 type: software
 version: "1.0.0"
+license: Apache-2.0
 authors:
   - family-names: "Bauer"
     given-names: "Waldemar"
