@@ -1,3 +1,6 @@
+[![DOI](https://zenodo.org/badge/1301312321.svg)](https://doi.org/10.5281/zenodo.21374983)
+
+
 # DEGA DUDU-BLDC Reproducibility Repository
 
 Reproduction code for the manuscript:
