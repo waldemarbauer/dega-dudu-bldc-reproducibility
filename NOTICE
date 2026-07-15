@@ -1,0 +1,13 @@
+DEGA DUDU-BLDC Reproducibility Repository
+Copyright 2026 Waldemar Bauer and Jerzy BAranowski
+
+This repository provides reproduction software for the manuscript:
+"DEGA: A Deterministic Diagnostic Evidence Governance Agent for
+Industrial IoT—A DUDU-BLDC Case Study."
+
+The DUDU-BLDC dataset is distributed separately through Zenodo:
+DOI: 10.5281/zenodo.15522163
+License: Creative Commons Attribution 4.0 International.
+
+The dataset is not covered by the Apache License 2.0 applicable to
+this repository.
