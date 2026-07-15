@@ -191,9 +191,22 @@ tests/               Lightweight public-repository contract tests
 
 ## License
 
-The source project supplied with this task contains only a placeholder license
-statement. **Choose and insert the intended public software license before
-publishing this repository.** No license has been invented during extraction.
+Unless otherwise indicated, the source code, configuration files, tests,
+reproduction scripts, and documentation in this repository are licensed under
+the Apache License, Version 2.0. See [`LICENSE`](LICENSE).
+
+The DUDU-BLDC dataset is not distributed as part of this repository. It is
+downloaded separately from Zenodo and is licensed by its creators under the
+Creative Commons Attribution 4.0 International License (CC BY 4.0). Use and
+redistribution of the dataset remain subject to its original license and
+citation requirements.
+
+Generated outputs may incorporate information derived from the DUDU-BLDC
+dataset. Users redistributing such outputs are responsible for providing the
+attribution required by the dataset license.
+
+The accompanying manuscript is not licensed through this repository.
+
 
 ## Citation
 
