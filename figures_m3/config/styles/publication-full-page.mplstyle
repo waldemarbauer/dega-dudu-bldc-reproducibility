@@ -1,0 +1,64 @@
+# Common publication defaults are duplicated intentionally because Matplotlib
+# style files do not provide a reliable inheritance mechanism.
+
+font.family: sans-serif
+font.sans-serif: DejaVu Sans
+mathtext.fontset: dejavusans
+text.usetex: False
+
+figure.facecolor: white
+axes.facecolor: white
+
+text.color: 0.10
+axes.labelcolor: 0.10
+axes.edgecolor: 0.30
+xtick.color: 0.20
+ytick.color: 0.20
+
+axes.spines.top: False
+axes.spines.right: False
+axes.axisbelow: True
+axes.grid: False
+legend.frameon: False
+legend.fancybox: False
+
+lines.antialiased: True
+lines.solid_capstyle: round
+lines.dash_capstyle: round
+patch.edgecolor: 0.25
+patch.force_edgecolor: False
+
+xtick.direction: out
+ytick.direction: out
+xtick.minor.visible: False
+ytick.minor.visible: False
+axes.formatter.use_mathtext: True
+axes.unicode_minus: True
+
+# Publication: full-page or vertically extensive figure.
+font.size: 9.0
+axes.labelsize: 9.0
+axes.titlesize: 9.0
+xtick.labelsize: 8.0
+ytick.labelsize: 8.0
+legend.fontsize: 8.0
+figure.titlesize: 9.5
+
+axes.linewidth: 0.85
+lines.linewidth: 1.40
+lines.markersize: 5.00
+patch.linewidth: 0.85
+
+xtick.major.size: 3.5
+xtick.major.width: 0.80
+ytick.major.size: 3.5
+ytick.major.width: 0.80
+xtick.major.pad: 3.0
+ytick.major.pad: 3.0
+
+axes.labelpad: 4.0
+axes.titlepad: 5.0
+legend.handlelength: 2.0
+legend.handletextpad: 0.6
+legend.columnspacing: 1.0
+errorbar.capsize: 2.4

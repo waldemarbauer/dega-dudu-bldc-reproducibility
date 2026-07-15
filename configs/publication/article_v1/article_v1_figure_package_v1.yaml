@@ -1,0 +1,85 @@
+schema_version: "1.0.0"
+config_type: article_v1_figure_package
+package_id: ARTICLEV1_FIGURE_PACKAGE_V1
+study: DUDU_BLDC_TRUSTWORTHY_AGENT_ARTICLE_V1
+source_policy:
+  mode: persisted_artifacts_only
+  train_models: false
+  recompute_classifier_inference: false
+  rerun_v6: false
+  regenerate_evidence_bundles: false
+  execute_scenarios: false
+  execute_agent: false
+style:
+  version: ARTICLEV1_PUBLICATION_STYLE_V1
+  font_family: DejaVu Sans
+  base_font_size: 8
+  title_font_size: 9
+  axis_label_size: 8
+  tick_label_size: 7
+  legend_font_size: 7
+  line_width: 1.2
+  marker_size: 4
+  dpi: 600
+  colors:
+    Healthy: "#0072B2"
+    Mech_Damage: "#D55E00"
+    Elec_Damage: "#009E73"
+    Mech_Elec_Damage: "#CC79A7"
+    reference: "#666666"
+    ink: "#1A1A1A"
+outputs:
+  root: Output/ArticleV1/Figures/v1
+  registry: Output/ArticleV1/Manifests/article_v1_figure_registry_v1.json
+  inventory: Output/ArticleV1/Tables/article_v1_figure_inventory.csv
+figures:
+  - id: Figure_01
+    name: acquisition_classifier_performance
+    required: true
+  - id: Figure_02
+    name: window_vs_acquisition_performance
+    required: true
+  - id: Figure_03
+    name: acquisition_confusion_matrices
+    required: true
+  - id: Figure_04
+    name: model_native_confidence_entropy
+    required: true
+  - id: Figure_05
+    name: v6_temporal_spline_comparison
+    required: true
+  - id: Figure_06
+    name: v6_derivatives_curvature
+    required: true
+  - id: Figure_07
+    name: healthy_relative_diagnostic_distance
+    required: true
+  - id: Figure_08
+    name: training_distribution_deviation
+    required: true
+  - id: Figure_09
+    name: risk_component_decomposition
+    required: true
+  - id: Figure_10
+    name: combined_risk_across_acquisitions
+    required: true
+  - id: Figure_11
+    name: state_path_comparison
+    required: false
+    condition: minimal_e2_complete
+  - id: Figure_12
+    name: final_outcome_by_scenario_policy
+    required: false
+    condition: minimal_e2_complete
+  - id: Figure_13
+    name: safetyguard_effect
+    required: false
+    condition: informative_safetyguard_override
+scientific_constraints:
+  canonical_classes: [Healthy, Mech_Damage, Elec_Damage, Mech_Elec_Damage]
+  spline_x_axis: ordered_canonical_window_index_0_24
+  no_degradation_time_label: true
+  no_failure_probability_interpretation: true
+  no_independence_confidence_intervals: true
+  confidence_is_model_native_uncalibrated: true
+  deviation_is_ood_surrogate_not_validated_detector: true

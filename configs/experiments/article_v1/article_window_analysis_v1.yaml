@@ -1,0 +1,95 @@
+schema_version: "1.0.0"
+config_type: article_window_analysis
+article_study: DUDU_BLDC_TRUSTWORTHY_AGENT_ARTICLE_V1
+protocol_id: ARTICLE_V1_CANONICAL_WINDOW_ANALYSIS_V1
+protocol_version: "1.0.0"
+registration_status: frozen_prerequisite_before_model_training
+
+data_units:
+  independent_source_unit: RAW_ACQUISITION
+  diagnostic_observation: CANONICAL_0P8_SECOND_WINDOW
+  temporal_evidence_unit: ORDERED_WINDOWS_WITHIN_ONE_ACQUISITION
+  primary_scientific_evaluation_unit: HELD_OUT_ACQUISITION
+  algorithmic_repetition: ALGORITHMIC_REPETITION_NOT_INDEPENDENT_DATASET
+  windows_are_nested_within_acquisitions: true
+  windows_are_independent_experimental_units: false
+
+dataset:
+  dataset_id: DUDU-BLDC
+  dataset_version: v1
+  record_id: "15522163"
+  doi: 10.5281/zenodo.15522163
+  archive_md5: b383b9ad1698a3aaf2fc05d4bf48dbe5
+  sampling_frequency_hz: 50000
+  samples_per_window: 40000
+  window_duration_seconds: 0.8
+  windows_per_acquisition: 25
+  canonical_window_count: 200
+  canonical_window_index: Data/AnalysisData/V2/Windows/window_index.parquet
+  canonical_window_provenance: Data/AnalysisData/V2/Windows/window_provenance.parquet
+  raw_source_root: Data/InputData/External/DUDU-BLDC-v1/extracted/DUDU-BLDC/Data/InputData
+  raw_hash_domain_separator: "DUDU-BLDC-V2-RAW-WINDOW-v1\\0"
+  ordering_field: window_index_within_acquisition
+
+canonical_classes:
+  - Healthy
+  - Mech_Damage
+  - Elec_Damage
+  - Mech_Elec_Damage
+
+raw_acquisitions:
+  - {acquisition_id: healthy_1, source_file: healthy_1.csv, canonical_class: Healthy, run_number: 1, source_sha256: c008ae6bdb3702af7ae5c066d0657806e8957bb88e2c445579f0945bcf920969}
+  - {acquisition_id: healthy_2, source_file: healthy_2.csv, canonical_class: Healthy, run_number: 2, source_sha256: 9214f3c9b33f5861664b723b5a71cd81e63b1d1cae9622dbab5bb7d26ff5d18c}
+  - {acquisition_id: healthy_zip_1, source_file: healthy_zip_1.csv, canonical_class: Mech_Damage, run_number: 1, source_sha256: 4514d6e987df8e7bff816299d7d155cd7ac54a7ec98e14fa455499ffa004ea3d}
+  - {acquisition_id: healthy_zip_2, source_file: healthy_zip_2.csv, canonical_class: Mech_Damage, run_number: 2, source_sha256: 1ffd44d19b7016bcdc45342af78858f440894d4cfb8d51a2d42db5ae4b6a4f34}
+  - {acquisition_id: faulty_1, source_file: faulty_1.csv, canonical_class: Elec_Damage, run_number: 1, source_sha256: 3aeebdc1ed1c598d78fb9b1fca2d11723050d8ad7075768d6ab0ca6f85b926dd}
+  - {acquisition_id: faulty_2, source_file: faulty_2.csv, canonical_class: Elec_Damage, run_number: 2, source_sha256: b865bb89711fe1faccd19415ad8de371e400d992194e4f7dfc211eac4080c53a}
+  - {acquisition_id: faulty_zip_1, source_file: faulty_zip_1.csv, canonical_class: Mech_Elec_Damage, run_number: 1, source_sha256: b0ecb0b933c044159b7541c9752b7679ceeb756ccc1004f092faf5731d472201}
+  - {acquisition_id: faulty_zip_2, source_file: faulty_zip_2.csv, canonical_class: Mech_Elec_Damage, run_number: 2, source_sha256: c35905ec9b8d01ae0f59cc6c94c23daaab58d00b368173da0e82c477efcd8ef3}
+
+assignments:
+  assignment_ids: [A00, A01, A02, A03, A04, A05, A06, A07, A08, A09, A10, A11, A12, A13, A14, A15]
+  algorithm: exhaustive_class_complete_binary_cartesian_product
+  bit_order: [Healthy, Mech_Damage, Elec_Damage, Mech_Elec_Damage]
+  bit_semantics:
+    "0": run_1_train_run_2_held_out
+    "1": run_2_train_run_1_held_out
+  training_acquisitions_per_assignment: 4
+  held_out_acquisitions_per_assignment: 4
+  training_windows_per_assignment: 100
+  held_out_windows_per_assignment: 100
+  validation_acquisitions_per_assignment: 0
+  validation_limitation: no_class_complete_acquisition_independent_validation_partition_exists
+  random_row_split: forbidden
+  random_window_split: forbidden
+
+feature_extraction:
+  config: configs/features/article_v1/canonical_window_features_v1.yaml
+  fit_scope: CASE_LOCAL
+  class_label_is_extractor_input: false
+  assignment_is_extractor_input: false
+  partition_is_extractor_input: false
+  training_fitted_operations: forbidden_in_this_task
+
+scientific_claim_boundaries:
+  true_degradation: forbidden
+  physical_failure_onset: forbidden
+  remaining_useful_life: forbidden
+  causal_progression: forbidden
+  permitted_sequence_term: ordered_windows_within_one_acquisition
+
+execution_gates:
+  classifier_training: forbidden
+  classifier_inference: forbidden
+  v6_trend_execution: forbidden
+  healthy_reference_fitting: forbidden
+  evidence_bundle_generation: forbidden
+  scenario_execution: forbidden
+  agent_execution: forbidden
+
+outputs:
+  assignment_root: Data/AnalysisData/ArticleV1/Assignments
+  feature_corpus: Data/AnalysisData/ArticleV1/WindowFeatures/article_v1_canonical_window_features.parquet
+  manifest_root: Output/ArticleV1/Manifests
+  table_root: Output/ArticleV1/Tables
+  report_root: Output/ArticleV1/Reports

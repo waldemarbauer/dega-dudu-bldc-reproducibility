@@ -1,0 +1,26 @@
+schema_version: "1.0.0"
+protocol_id: TRAINING_DISTRIBUTION_DEVIATION_V1
+method_id: TRAINING_DISTRIBUTION_DEVIATION_V1
+method_version: "1.0.0"
+scientific_status: OOD_SURROGATE_NOT_EXTERNALLY_VALIDATED
+interpretation: >-
+  Deterministic distance of a held-out ArticleV1 feature vector from the
+  active assignment's training-feature distribution.
+fit_scope: assignment_training_windows_only
+label_input_allowed: false
+held_out_fit_allowed: false
+feature_count: 28
+scaling:
+  implementation: sklearn.preprocessing.StandardScaler
+  fit_partition: train
+covariance:
+  implementation: sklearn.covariance.LedoitWolf
+  fit_partition: train
+  assume_centered: false
+distance: squared_mahalanobis
+bounded_score:
+  formula: (1 + count(training_distance <= held_out_distance)) / (n_train + 1)
+  range: (0, 1]
+threshold: null
+deterministic_seed: null
+

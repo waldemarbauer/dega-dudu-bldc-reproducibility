@@ -1,0 +1,94 @@
+schema_version: "1.0.0"
+config_type: article_evidence_pipeline
+article_study: DUDU_BLDC_TRUSTWORTHY_AGENT_ARTICLE_V1
+pipeline_id: DIAGNOSTIC_EVIDENCE_PIPELINE
+pipeline_version: "1.0.0"
+
+execution_contract:
+  deterministic: true
+  classifier_fit_allowed: false
+  classifier_inference_allowed: false
+  representation_regeneration_allowed: false
+  trend_recomputation_allowed: false
+  ground_truth_label_access_allowed: false
+  decision_or_transition_allowed: false
+  persisted_inputs_only: true
+
+class_schema:
+  - Healthy
+  - Mech_Damage
+  - Elec_Damage
+  - Mech_Elec_Damage
+
+window_evidence:
+  confidence_definition: max_class_probability
+  entropy_definition: normalized_shannon_entropy
+  ordering_identity: timestamp_xor_ordinal_index
+  ood_range: [0.0, 1.0]
+
+acquisition_aggregation:
+  default: mean_probability
+  registered:
+    - mean_probability
+    - median_probability
+    - majority_vote
+    - confidence_weighted
+  ground_truth_labels_forbidden: true
+  reject_mixed:
+    - assignment_id
+    - partition
+    - acquisition_id
+    - model_hash
+    - representation_id
+    - feature_schema_hash
+
+trend_evidence:
+  source: persisted_only
+  representation_id: WINDOW_TEMPORAL_SPLINE
+  representation_version: "1.0.0"
+  fit_or_transform_allowed: false
+  failed_status_behavior: reject_before_context_attachment
+
+risk_evidence:
+  role: evidence_only_no_decision
+  weights:
+    status: experimental_default
+    source: pre_registered_article_evidence_contract
+    version: "1.0.0"
+    classifier_uncertainty: 0.25
+    trend_uncertainty: 0.20
+    ood_contribution: 0.20
+    healthy_deviation: 0.20
+    conflict: 0.15
+  normalization:
+    trend_uncertainty_scale:
+      value: 1.0
+      status: experimental_default
+      source: pre_registered_article_evidence_contract
+      version: "1.0.0"
+    healthy_deviation_scale:
+      value: 3.0
+      status: experimental_default
+      source: three_standardized_distance_units
+      version: "1.0.0"
+    conflict_healthy_deviation_threshold:
+      value: 0.5
+      status: experimental_default
+      source: pre_registered_article_evidence_contract
+      version: "1.0.0"
+
+healthy_reference:
+  fit_scope: training_only
+  unknown_hash_behavior: reject_when_healthy_deviation_is_used
+
+safety_projection:
+  safety_guard_authoritative: true
+  fields:
+    - risk_score
+    - confidence
+    - ood_score
+    - spline_classifier_conflict
+
+failure_behavior:
+  mode: fail_closed
+  emit_machine_readable_reason_codes: true

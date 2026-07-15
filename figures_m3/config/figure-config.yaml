@@ -1,0 +1,293 @@
+# DEGA Milestone M3 — computational figure configuration.
+#
+# Scientific specification for every M3 computational figure. This file is
+# user-controlled scientific content; generated state (hashes, measurements)
+# belongs in figures_m3/data_manifest/figure_manifest.yaml, never here.
+#
+# Governing constraint: no new scientific experiments. Every figure consumes
+# frozen ArticleV1 artifacts. `scientific_transform` is `none` everywhere.
+
+schema_version: 1
+
+project:
+  name: DEGA
+  milestone: M3
+  study: ArticleV1
+  dataset: DUDU-BLDC
+  palette: blue_ribbon_v1
+  neutral_palette: neutral_v1
+  highlight_palette: yellow_ribbon_v1
+  style_dir: figures_m3/config/styles
+  output_root: figures_m3/output
+
+# Canonical orderings. Applied identically in every figure so that a reader can
+# carry one mental mapping across the whole figure set.
+orderings:
+  classifier:
+    - logistic_regression
+    - random_forest
+    - hist_gradient_boosting
+  classifier_label:
+    logistic_regression: Logistic regression
+    random_forest: Random forest
+    hist_gradient_boosting: Hist. gradient boosting
+  diagnostic_class:
+    - Healthy
+    - Mech_Damage
+    - Elec_Damage
+    - Mech_Elec_Damage
+  trend_model:
+    - RollingSmoothingSpline
+    - RollingBSpline
+    - RollingPSpline
+    - RollingHealthyRelativeSpline
+  policy:
+    - StaticTransitionMatrixPolicy
+    - DeterministicPosteriorApproximationPolicy
+    - BayesianMCMCTransitionPolicy
+    - HybridTransitionPolicy
+  policy_label:
+    StaticTransitionMatrixPolicy: Static transition matrix
+    DeterministicPosteriorApproximationPolicy: Deterministic posterior approx.
+    BayesianMCMCTransitionPolicy: Bayesian MCMC
+    HybridTransitionPolicy: Hybrid
+  scenario:
+    - ARTICLE_SCENARIO_01_NATURAL_HEALTHY
+    - ARTICLE_SCENARIO_03_NATURAL_HIGH_RISK
+    - ARTICLE_SCENARIO_05_NATURAL_CONFLICT_CANDIDATE
+  scenario_label:
+    ARTICLE_SCENARIO_01_NATURAL_HEALTHY: "S01 natural healthy"
+    ARTICLE_SCENARIO_03_NATURAL_HIGH_RISK: "S03 natural high risk"
+    ARTICLE_SCENARIO_05_NATURAL_CONFLICT_CANDIDATE: "S05 natural conflict candidate"
+
+# Evaluation facts verified against frozen artifacts during the M3 audit.
+# Figure code asserts these at build time; a mismatch fails the build.
+evaluation_units:
+  source_acquisitions: 8
+  total_windows: 200
+  assignment_views: 16
+  assignment_view_dependence: dependent_exhaustive
+  held_out_acquisitions_per_view: 4
+  held_out_windows_per_view: 100
+  training_acquisitions_per_view: 4
+  training_windows_per_view: 100
+  experimental_unit: acquisition
+  feature_count: 28
+  classifier_count: 3
+  interpretation_flag: DESCRIPTIVE_DEPENDENT_EVALUATION_VIEW
+
+figures:
+  FIG_A:
+    title: Acquisition-level classifier performance across dependent assignment views
+    profile: publication
+    export_profile: publication-double-column
+    layout: double-column
+    dimensions: {width_in: 7.0, height_in: 2.5}
+    replaces: Figure_01_acquisition_classifier_performance
+    message: >
+      Acquisition-level performance is reported over 16 dependent exhaustive
+      assignment views of the same 8 acquisitions, not 16 independent
+      experiments; every view is shown individually.
+    source_artifacts:
+      - Output/ArticleV1/Tables/article_acquisition_metrics_by_assignment.csv
+      - Output/ArticleV1/Tables/acquisition_assignment_summary.csv
+    displayed_quantities: [macro_f1, balanced_accuracy]
+    encoding: stacked dot plot, one dot per assignment view, median rule
+    scientific_transform: none
+    limitations: >
+      Each view scores only 4 held-out acquisitions, so the metric is coarsely
+      quantised. Spread across views is not a sampling error bar.
+
+  FIG_B:
+    title: Window-level versus acquisition-level evaluation
+    profile: publication
+    export_profile: publication-double-column
+    layout: double-column
+    dimensions: {width_in: 7.0, height_in: 2.7}
+    replaces: Figure_02_window_vs_acquisition_performance
+    message: >
+      Evaluation level materially changes reported performance; window-level
+      scores treat 100 correlated windows as if they were test objects.
+    source_artifacts:
+      - Output/ArticleV1/Tables/article_window_metrics_by_assignment.csv
+      - Output/ArticleV1/Tables/article_acquisition_metrics_by_assignment.csv
+    displayed_quantities: [macro_f1]
+    encoding: paired slope lines per assignment view, one panel per classifier
+    scientific_transform: none
+    pairing_key: [assignment_id, classifier_id]
+    limitations: >
+      Windows are correlated within an acquisition and are not independent test
+      observations. The pairing is exact: both levels come from the same fitted
+      model in the same assignment view.
+
+  FIG_C:
+    title: Available spline (trend) evidence is scalar-only
+    profile: publication
+    export_profile: publication-double-column
+    layout: double-column
+    dimensions: {width_in: 7.0, height_in: 2.7}
+    replaces: [Figure_05_v6_temporal_spline_comparison, Figure_06_v6_derivatives_curvature]
+    message: >
+      ArticleV1 persists spline evidence as scalar descriptors only. No ordered
+      feature sequence, evaluation grid, derivative array, curvature array or
+      uncertainty band exists, so no trajectory figure can be produced.
+    source_artifacts:
+      - Output/ArticleV1/Figures/v1/Figure_05_v6_temporal_spline_comparison_data.csv
+      - Output/ArticleV1/Figures/v1/Figure_06_v6_derivatives_curvature_data.csv
+      - src/trustworthy_agent/evidence/trend.py
+    displayed_quantities: [trend_value, first_derivative, second_derivative, curvature, maximum_curvature]
+    encoding: symlog dot strips by trend model; symlog descriptor strip for one record
+    scientific_transform: none
+    reduced_figure: true
+    reduced_reason: >
+      The TrendEvidence dataclass is scalar-only by construction and
+      Output/ArticleV1/Results/TrendEvidence is git-ignored and absent. Building
+      a trajectory would require refitting splines and extending the evidence
+      schema, i.e. a new experiment.
+    limitations: >
+      Derivatives are with respect to ordered/normalized window position, not
+      physical time. Maximum curvature marks the strongest local geometric
+      change in the ordered sequence, not fault onset. Not remaining useful life.
+
+  FIG_D:
+    title: Risk-component resolution and saturation
+    profile: publication
+    export_profile: publication-double-column
+    layout: double-column
+    dimensions: {width_in: 7.0, height_in: 2.7}
+    replaces: [Figure_09_risk_component_decomposition, Figure_10_combined_risk_acquisitions, Figure_07_healthy_relative_distance]
+    message: >
+      Only classifier uncertainty resolves cases. The OOD and trend-uncertainty
+      components are saturated at their upper bound and carry almost no
+      discriminative information.
+    source_artifacts:
+      - Output/ArticleV1/Figures/v1/Figure_10_combined_risk_acquisitions_data.csv
+    displayed_quantities:
+      [classifier_uncertainty, trend_uncertainty, ood_contribution, healthy_deviation, combined_risk]
+    encoding: empirical CDF per component with saturation annotation; distinct-value counts
+    scientific_transform: none
+    row_count: 768
+    limitations: >
+      Combined risk is not a probability of failure. Saturation is shown, not
+      rescaled: no weight or scale was retuned. The 768 rows are a full crossing
+      of 16 dependent views x 4 held-out acquisitions x 3 classifiers x 4 trend
+      models and are not independent observations.
+
+  FIG_E:
+    title: Global permutation importance
+    profile: publication
+    export_profile: publication-single-column
+    layout: single-column
+    dimensions: {width_in: 3.5, height_in: 4.8}
+    replaces: XAI_Figure_01_global_permutation_importance
+    message: >
+      The executed global explanation is a case-specific permutation-importance
+      ranking for one model in one assignment view, not a universal physical
+      feature ranking.
+    source_artifacts:
+      - Output/ArticleV1/XAI/Minimal/GlobalPermutationImportance/distributions.csv
+      - Output/ArticleV1/XAI/Minimal/GlobalPermutationImportance/repeat_distributions.csv
+    displayed_quantities: [mean_importance, importance_drop]
+    encoding: ordered horizontal dots with individual permutation repeats
+    scientific_transform: none
+    executed_model: random_forest
+    executed_assignment: A00
+    scoring_metric: balanced_accuracy
+    n_repeats: 30
+    limitations: >
+      Valid only for random_forest under assignment view A00, scored by
+      balanced accuracy on 100 correlated held-out windows. Importance drops are
+      small in absolute terms.
+
+  FIG_F:
+    title: Explanation stability across dependent assignment views
+    profile: publication
+    export_profile: publication-double-column
+    layout: double-column
+    dimensions: {width_in: 7.0, height_in: 2.8}
+    replaces: XAI_Figure_03_explanation_stability
+    message: >
+      Top-10 feature sets overlap weakly across the 16 assignment views,
+      exposing explanation instability caused by very small acquisition-level
+      training sets.
+    source_artifacts:
+      - Output/ArticleV1/XAI/Minimal/ExplanationStability/jaccard_matrix.csv
+      - Output/ArticleV1/XAI/Minimal/ExplanationStability/top10_frequency.csv
+    displayed_quantities: [jaccard, top10_frequency]
+    encoding: 16x16 pairwise Jaccard heatmap plus distribution of the 120 unique pairs
+    scientific_transform: none
+    k: 10
+    similarity_metric: jaccard
+    limitations: >
+      The 16 views are dependent exhaustive views of the same 8 acquisitions, so
+      low similarity cannot be read as variation across independent datasets.
+
+  FIG_G:
+    title: Terminal outcome of all 12 representative DEGA executions
+    profile: publication
+    export_profile: publication-double-column
+    layout: double-column
+    dimensions: {width_in: 7.0, height_in: 2.6}
+    replaces: Figure_12_agent_final_outcomes
+    message: >
+      All 12 representative executions terminate without an automated
+      recommendation; the terminal outcome is determined by the transition
+      policy alone and is invariant to the scenario.
+    source_artifacts:
+      - Output/ArticleV1/Tables/minimal_e2_final_outcomes.csv
+      - Output/ArticleV1/Tables/minimal_e2_safetyguard_summary.csv
+      - Output/ArticleV1/Tables/minimal_e2_run_summary.csv
+    displayed_quantities: [final_action, override_count, state_path_length, bundle_hash]
+    encoding: scenario x policy matrix with written terminal outcome
+    scientific_transform: none
+    disclose_shared_bundle: true
+    limitations: >
+      n = 12 representative workflow executions, not a statistical benchmark.
+      Proportions must not be read as performance estimates. Scenarios S01 and
+      S05 share one EvidenceBundle hash, so only 2 distinct bundles underlie the
+      3 scenario labels.
+
+  FIG_H:
+    title: The two realized DEGA state paths
+    profile: publication
+    export_profile: publication-double-column
+    layout: double-column
+    dimensions: {width_in: 7.0, height_in: 2.4}
+    replaces: Figure_11_agent_state_paths
+    message: >
+      The 12 executions realize only two distinct state paths: a 9-state path
+      reaching escalation and a 4-state path short-circuiting to no decision.
+    source_artifacts:
+      - Output/ArticleV1/Tables/minimal_e2_state_paths.csv
+      - Output/ArticleV1/AgentRuns/MinimalE2/*/audit.jsonl
+    displayed_quantities: [state_id, step]
+    encoding: aligned state-sequence plot, one row per distinct path
+    scientific_transform: none
+    limitations: >
+      Only 2 distinct paths exist across the 12 runs, so this figure enumerates
+      them exhaustively rather than summarising a distribution.
+
+  FIG_I:
+    title: Evidence hashing, audit-chain integrity and deterministic replay
+    profile: publication
+    export_profile: publication-single-column
+    layout: single-column
+    dimensions: {width_in: 3.5, height_in: 2.2}
+    replaces: null
+    supplements: Output/ArticleV1/Reports/minimal_e2_replay_report.md
+    message: >
+      Every EvidenceBundle reconstruction, audit chain and deterministic replay
+      that ArticleV1 defines was verified.
+    source_artifacts:
+      - Output/ArticleV1/Reports/article_v1_evidence_bundle_validation.md
+      - Output/ArticleV1/Reports/minimal_e2_replay_report.md
+      - Output/ArticleV1/Tables/article_v1_bundle_coverage.csv
+      - Output/ArticleV1/Tables/minimal_e2_run_summary.csv
+      - Output/ArticleV1/AgentRuns/MinimalE2/*/audit.jsonl
+    displayed_quantities: [verified_count, total_count]
+    encoding: verified-versus-total completion bars with exact counts
+    scientific_transform: none
+    limitations: >
+      Counts are integrity checks over frozen artifacts. They state that the
+      recorded computation reproduces exactly; they say nothing about
+      diagnostic accuracy.

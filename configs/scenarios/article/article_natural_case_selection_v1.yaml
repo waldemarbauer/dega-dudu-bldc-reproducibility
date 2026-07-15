@@ -1,0 +1,29 @@
+schema_version: "1.0.0"
+protocol_id: ARTICLE_V1_NATURAL_CASE_SELECTION_V1
+article_study: DUDU_BLDC_TRUSTWORTHY_AGENT_ARTICLE_V1
+configured_diagnostic_facts: 0
+execution_allowed: false
+primary_identity:
+  assignment_id: A00
+  classifier_id: logistic_regression
+  trend_model_id: RollingHealthyRelativeSpline
+  selection_basis: deterministic_protocol_anchor_not_model_superiority
+rules:
+  NATURAL_HEALTHY:
+    eligible: unique_held_out_Healthy_acquisition_under_primary_identity
+    ranking: none
+  NATURAL_HIGH_RISK:
+    eligible: non_Healthy_held_out_acquisitions_under_primary_identity
+    ranking:
+      - combined_risk_descending
+      - acquisition_id_ascending
+    claim_scope: illustrative_evidence_selected_high_risk_case
+  NATURAL_CONFLICT_CANDIDATE:
+    required_criterion: classifier_trend_conflict_true
+    ranking:
+      - classifier_trend_conflict_true_first
+      - window_prediction_instability_true_first
+      - combined_risk_descending
+      - acquisition_id_ascending
+    empty_result: NO_NATURAL_CONFLICT_CANDIDATE_FOUND
+

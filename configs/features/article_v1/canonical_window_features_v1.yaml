@@ -1,0 +1,114 @@
+schema_version: "1.0.0"
+config_type: canonical_window_feature_schema
+article_study: DUDU_BLDC_TRUSTWORTHY_AGENT_ARTICLE_V1
+feature_schema_id: ARTICLE_V1_CANONICAL_RAW_WINDOW_FEATURES
+feature_schema_version: "1.0.0"
+extractor_version: "1.0.0"
+status: frozen_case_local_prerequisite
+
+input_contract:
+  samples_per_window: 40000
+  sampling_frequency_hz: 50000
+  channels:
+    current_amperes: {source: "CURRENT (V)", conversion: "(CURRENT (V) - 2.5) * 8", unit: A}
+    rotational_speed_rpm: {source: "ROTO (V)", conversion: "ROTO (V) * 10000", unit: RPM}
+  class_label_is_input: false
+  assignment_is_input: false
+  partition_is_input: false
+  require_all_finite: true
+
+fit_scope:
+  case_local_only: true
+  training_fitted_operations_present: false
+  excluded_operations: [imputation, scaling, feature_selection, healthy_reference, threshold_fitting, calibration, ood_fitting]
+
+numerical_conventions:
+  standard_deviation: population_ddof_0
+  variance: population_ddof_0
+  skewness: standardized_third_central_moment
+  kurtosis: excess_standardized_fourth_central_moment
+  zero_variance_moment_behavior: explicit_zero
+  zero_rms_crest_behavior: explicit_zero
+  spectral_window: periodic_hann
+  spectral_input: mean_removed_signal
+  spectral_energy: "one-sided Parseval power normalized by N*sum(hann^2)"
+  spectral_centroid: "sum(f_k*P_k)/sum(P_k); zero only when total spectral power is zero"
+  spectral_bandwidth: "sqrt(sum((f_k-centroid)^2*P_k)/sum(P_k)); zero only when total spectral power is zero"
+
+harmonic_semantics:
+  status: NOT_IMPLEMENTED_FOR_ARTICLE_V1
+  requested_features: [current_1x, current_2x, current_3x, speed_1x, speed_2x, speed_3x]
+  physically_required_reference: acquisition_local_rotational_frequency
+  observed_blocker: canonical_windows_exist_with_no_positive_rotational_speed_samples
+  rejected_fallbacks: [arbitrary_fft_bins, zero_fill, cross_acquisition_frequency_borrowing, held_out_informed_reference]
+  consequence: harmonic_features_are_not_members_of_feature_order
+  limitation: available channels_do_not_support_a_case_local_fundamental_for_every_canonical_window
+  scientific_interpretation: DOMAIN_HYPOTHESIS
+
+not_implemented_features:
+  - {feature_id: NI001, feature_name: current_harmonic_1x_amplitude, channel: current_amperes, formula: "max(A(f_k)) within a declared band around f_rot", unit: A, domain: frequency, implementation: NOT_IMPLEMENTED_FOR_ARTICLE_V1, required_preprocessing: defensible_case_local_rotational_frequency_and_mean_removed_hann_rfft, frequency_reference: 1x_rotational_frequency_unavailable_for_all_windows, interpretation: candidate shaft-referenced current amplitude; diagnostic meaning is not causally established, interpretation_evidence_class: DOMAIN_HYPOTHESIS, schema_version: "1.0.0", included_in_feature_vector: false}
+  - {feature_id: NI002, feature_name: current_harmonic_2x_amplitude, channel: current_amperes, formula: "max(A(f_k)) within a declared band around 2*f_rot", unit: A, domain: frequency, implementation: NOT_IMPLEMENTED_FOR_ARTICLE_V1, required_preprocessing: defensible_case_local_rotational_frequency_and_mean_removed_hann_rfft, frequency_reference: 2x_rotational_frequency_unavailable_for_all_windows, interpretation: candidate twice-shaft-referenced current amplitude; diagnostic meaning is not causally established, interpretation_evidence_class: DOMAIN_HYPOTHESIS, schema_version: "1.0.0", included_in_feature_vector: false}
+  - {feature_id: NI003, feature_name: current_harmonic_3x_amplitude, channel: current_amperes, formula: "max(A(f_k)) within a declared band around 3*f_rot", unit: A, domain: frequency, implementation: NOT_IMPLEMENTED_FOR_ARTICLE_V1, required_preprocessing: defensible_case_local_rotational_frequency_and_mean_removed_hann_rfft, frequency_reference: 3x_rotational_frequency_unavailable_for_all_windows, interpretation: candidate three-times-shaft-referenced current amplitude; diagnostic meaning is not causally established, interpretation_evidence_class: DOMAIN_HYPOTHESIS, schema_version: "1.0.0", included_in_feature_vector: false}
+  - {feature_id: NI004, feature_name: speed_harmonic_1x_amplitude, channel: rotational_speed_rpm, formula: "max(A(f_k)) within a declared band around f_rot", unit: RPM, domain: frequency, implementation: NOT_IMPLEMENTED_FOR_ARTICLE_V1, required_preprocessing: defensible_case_local_rotational_frequency_and_mean_removed_hann_rfft, frequency_reference: 1x_rotational_frequency_unavailable_for_all_windows, interpretation: candidate shaft-referenced speed-variation amplitude; diagnostic meaning is not causally established, interpretation_evidence_class: DOMAIN_HYPOTHESIS, schema_version: "1.0.0", included_in_feature_vector: false}
+  - {feature_id: NI005, feature_name: speed_harmonic_2x_amplitude, channel: rotational_speed_rpm, formula: "max(A(f_k)) within a declared band around 2*f_rot", unit: RPM, domain: frequency, implementation: NOT_IMPLEMENTED_FOR_ARTICLE_V1, required_preprocessing: defensible_case_local_rotational_frequency_and_mean_removed_hann_rfft, frequency_reference: 2x_rotational_frequency_unavailable_for_all_windows, interpretation: candidate twice-shaft-referenced speed-variation amplitude; diagnostic meaning is not causally established, interpretation_evidence_class: DOMAIN_HYPOTHESIS, schema_version: "1.0.0", included_in_feature_vector: false}
+  - {feature_id: NI006, feature_name: speed_harmonic_3x_amplitude, channel: rotational_speed_rpm, formula: "max(A(f_k)) within a declared band around 3*f_rot", unit: RPM, domain: frequency, implementation: NOT_IMPLEMENTED_FOR_ARTICLE_V1, required_preprocessing: defensible_case_local_rotational_frequency_and_mean_removed_hann_rfft, frequency_reference: 3x_rotational_frequency_unavailable_for_all_windows, interpretation: candidate three-times-shaft-referenced speed-variation amplitude; diagnostic meaning is not causally established, interpretation_evidence_class: DOMAIN_HYPOTHESIS, schema_version: "1.0.0", included_in_feature_vector: false}
+
+feature_order:
+  - current_mean
+  - current_standard_deviation
+  - current_variance
+  - current_rms
+  - current_maximum
+  - current_minimum
+  - current_peak_absolute
+  - current_peak_to_peak
+  - current_skewness
+  - current_excess_kurtosis
+  - current_crest_factor
+  - current_spectral_energy
+  - current_spectral_centroid_hz
+  - current_spectral_bandwidth_hz
+  - speed_mean
+  - speed_standard_deviation
+  - speed_variance
+  - speed_rms
+  - speed_maximum
+  - speed_minimum
+  - speed_peak_absolute
+  - speed_peak_to_peak
+  - speed_skewness
+  - speed_excess_kurtosis
+  - speed_crest_factor
+  - speed_spectral_energy
+  - speed_spectral_centroid_hz
+  - speed_spectral_bandwidth_hz
+
+features:
+  - {feature_id: F001, feature_name: current_mean, channel: current_amperes, formula: "(1/N)*sum(x[n])", unit: A, domain: time, implementation: numpy.mean_float64, required_preprocessing: none, frequency_reference: not_applicable, interpretation: arithmetic level in one window, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F002, feature_name: current_standard_deviation, channel: current_amperes, formula: "sqrt((1/N)*sum((x[n]-mean(x))^2))", unit: A, domain: time, implementation: numpy.std_float64_ddof_0, required_preprocessing: none, frequency_reference: not_applicable, interpretation: within-window dispersion, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F003, feature_name: current_variance, channel: current_amperes, formula: "(1/N)*sum((x[n]-mean(x))^2)", unit: A^2, domain: time, implementation: numpy.var_float64_ddof_0, required_preprocessing: mean, frequency_reference: not_applicable, interpretation: squared within-window dispersion, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F004, feature_name: current_rms, channel: current_amperes, formula: "sqrt((1/N)*sum(x[n]^2))", unit: A, domain: time, implementation: numpy_root_mean_square_float64, required_preprocessing: none, frequency_reference: not_applicable, interpretation: root-mean-square magnitude, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F005, feature_name: current_maximum, channel: current_amperes, formula: "max(x[n])", unit: A, domain: time, implementation: numpy.max_float64, required_preprocessing: none, frequency_reference: not_applicable, interpretation: largest signed sample, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F006, feature_name: current_minimum, channel: current_amperes, formula: "min(x[n])", unit: A, domain: time, implementation: numpy.min_float64, required_preprocessing: none, frequency_reference: not_applicable, interpretation: smallest signed sample, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F007, feature_name: current_peak_absolute, channel: current_amperes, formula: "max(abs(x[n]))", unit: A, domain: time, implementation: numpy.max_absolute_float64, required_preprocessing: none, frequency_reference: not_applicable, interpretation: largest absolute sample magnitude, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F008, feature_name: current_peak_to_peak, channel: current_amperes, formula: "max(x[n])-min(x[n])", unit: A, domain: time, implementation: numpy.ptp_float64, required_preprocessing: none, frequency_reference: not_applicable, interpretation: observed within-window range, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F009, feature_name: current_skewness, channel: current_amperes, formula: "mean((x-mean(x))^3)/std(x)^3", unit: dimensionless, domain: time, implementation: deterministic_population_moment, required_preprocessing: mean_and_population_std, frequency_reference: not_applicable, interpretation: distribution asymmetry; zero convention for zero variance, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F010, feature_name: current_excess_kurtosis, channel: current_amperes, formula: "mean((x-mean(x))^4)/std(x)^4-3", unit: dimensionless, domain: time, implementation: deterministic_population_moment, required_preprocessing: mean_and_population_std, frequency_reference: not_applicable, interpretation: tail and peakedness descriptor; zero convention for zero variance, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F011, feature_name: current_crest_factor, channel: current_amperes, formula: "max(abs(x[n]))/RMS(x)", unit: dimensionless, domain: time, implementation: deterministic_peak_over_rms, required_preprocessing: rms, frequency_reference: not_applicable, interpretation: peak magnitude relative to RMS, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F012, feature_name: current_spectral_energy, channel: current_amperes, formula: "sum(one_sided_abs_rfft(x_centered*hann)^2)/(N*sum(hann^2))", unit: A^2, domain: frequency, implementation: deterministic_hann_rfft_parseval_power, required_preprocessing: mean_removal_and_periodic_hann, frequency_reference: rfft_bin_frequencies, interpretation: mean-removed windowed spectral power, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F013, feature_name: current_spectral_centroid_hz, channel: current_amperes, formula: "sum(f_k*P_k)/sum(P_k)", unit: Hz, domain: frequency, implementation: deterministic_power_weighted_centroid, required_preprocessing: mean_removal_and_periodic_hann, frequency_reference: rfft_bin_frequencies, interpretation: power-weighted frequency center, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F014, feature_name: current_spectral_bandwidth_hz, channel: current_amperes, formula: "sqrt(sum((f_k-centroid)^2*P_k)/sum(P_k))", unit: Hz, domain: frequency, implementation: deterministic_power_weighted_bandwidth, required_preprocessing: mean_removal_periodic_hann_and_centroid, frequency_reference: rfft_bin_frequencies, interpretation: power-weighted frequency spread, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F015, feature_name: speed_mean, channel: rotational_speed_rpm, formula: "(1/N)*sum(x[n])", unit: RPM, domain: time, implementation: numpy.mean_float64, required_preprocessing: none, frequency_reference: not_applicable, interpretation: arithmetic speed level in one window, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F016, feature_name: speed_standard_deviation, channel: rotational_speed_rpm, formula: "sqrt((1/N)*sum((x[n]-mean(x))^2))", unit: RPM, domain: time, implementation: numpy.std_float64_ddof_0, required_preprocessing: none, frequency_reference: not_applicable, interpretation: within-window speed dispersion, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F017, feature_name: speed_variance, channel: rotational_speed_rpm, formula: "(1/N)*sum((x[n]-mean(x))^2)", unit: RPM^2, domain: time, implementation: numpy.var_float64_ddof_0, required_preprocessing: mean, frequency_reference: not_applicable, interpretation: squared within-window speed dispersion, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F018, feature_name: speed_rms, channel: rotational_speed_rpm, formula: "sqrt((1/N)*sum(x[n]^2))", unit: RPM, domain: time, implementation: numpy_root_mean_square_float64, required_preprocessing: none, frequency_reference: not_applicable, interpretation: speed root-mean-square magnitude, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F019, feature_name: speed_maximum, channel: rotational_speed_rpm, formula: "max(x[n])", unit: RPM, domain: time, implementation: numpy.max_float64, required_preprocessing: none, frequency_reference: not_applicable, interpretation: largest signed speed sample, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F020, feature_name: speed_minimum, channel: rotational_speed_rpm, formula: "min(x[n])", unit: RPM, domain: time, implementation: numpy.min_float64, required_preprocessing: none, frequency_reference: not_applicable, interpretation: smallest signed speed sample, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F021, feature_name: speed_peak_absolute, channel: rotational_speed_rpm, formula: "max(abs(x[n]))", unit: RPM, domain: time, implementation: numpy.max_absolute_float64, required_preprocessing: none, frequency_reference: not_applicable, interpretation: largest absolute speed magnitude, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F022, feature_name: speed_peak_to_peak, channel: rotational_speed_rpm, formula: "max(x[n])-min(x[n])", unit: RPM, domain: time, implementation: numpy.ptp_float64, required_preprocessing: none, frequency_reference: not_applicable, interpretation: observed within-window speed range, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F023, feature_name: speed_skewness, channel: rotational_speed_rpm, formula: "mean((x-mean(x))^3)/std(x)^3", unit: dimensionless, domain: time, implementation: deterministic_population_moment, required_preprocessing: mean_and_population_std, frequency_reference: not_applicable, interpretation: speed-distribution asymmetry; zero convention for zero variance, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F024, feature_name: speed_excess_kurtosis, channel: rotational_speed_rpm, formula: "mean((x-mean(x))^4)/std(x)^4-3", unit: dimensionless, domain: time, implementation: deterministic_population_moment, required_preprocessing: mean_and_population_std, frequency_reference: not_applicable, interpretation: speed tail and peakedness descriptor; zero convention for zero variance, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F025, feature_name: speed_crest_factor, channel: rotational_speed_rpm, formula: "max(abs(x[n]))/RMS(x)", unit: dimensionless, domain: time, implementation: deterministic_peak_over_rms, required_preprocessing: rms, frequency_reference: not_applicable, interpretation: speed peak magnitude relative to RMS, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F026, feature_name: speed_spectral_energy, channel: rotational_speed_rpm, formula: "sum(one_sided_abs_rfft(x_centered*hann)^2)/(N*sum(hann^2))", unit: RPM^2, domain: frequency, implementation: deterministic_hann_rfft_parseval_power, required_preprocessing: mean_removal_and_periodic_hann, frequency_reference: rfft_bin_frequencies, interpretation: mean-removed windowed speed spectral power, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F027, feature_name: speed_spectral_centroid_hz, channel: rotational_speed_rpm, formula: "sum(f_k*P_k)/sum(P_k)", unit: Hz, domain: frequency, implementation: deterministic_power_weighted_centroid, required_preprocessing: mean_removal_and_periodic_hann, frequency_reference: rfft_bin_frequencies, interpretation: power-weighted speed-variation frequency center, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}
+  - {feature_id: F028, feature_name: speed_spectral_bandwidth_hz, channel: rotational_speed_rpm, formula: "sqrt(sum((f_k-centroid)^2*P_k)/sum(P_k))", unit: Hz, domain: frequency, implementation: deterministic_power_weighted_bandwidth, required_preprocessing: mean_removal_periodic_hann_and_centroid, frequency_reference: rfft_bin_frequencies, interpretation: power-weighted speed-variation frequency spread, interpretation_evidence_class: EMPIRICALLY_MEASURED, schema_version: "1.0.0"}

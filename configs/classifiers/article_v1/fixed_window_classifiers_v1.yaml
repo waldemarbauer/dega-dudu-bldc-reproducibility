@@ -1,0 +1,68 @@
+schema_version: "1.0.0"
+protocol_id: DUDU_BLDC_TRUSTWORTHY_AGENT_ARTICLE_V1
+configuration_id: ARTICLE_V1_FIXED_WINDOW_CLASSIFIERS_V1
+configuration_status: FROZEN_BEFORE_FIRST_FIT
+base_seed: 20260714
+seed_derivation:
+  version: sha256-v1
+  rule: "uint32(first_8_hex(sha256(protocol_id|assignment_id|classifier_id|base_seed)))"
+canonical_class_order:
+  - Healthy
+  - Mech_Damage
+  - Elec_Damage
+  - Mech_Elec_Damage
+probability_status: MODEL_NATIVE_UNCALIBRATED_PROBABILITIES
+reload_tolerance:
+  absolute: 0.0
+  relative: 0.0
+aggregation:
+  strategy: mean_probability
+  normalization_tolerance: 1.0e-12
+classifiers:
+  logistic_regression:
+    classifier_version: sklearn-logistic-regression-1
+    pipeline:
+      - {step: imputer, implementation: SimpleImputer, strategy: median}
+      - {step: scaler, implementation: StandardScaler}
+      - step: classifier
+        implementation: LogisticRegression
+        C: 1.0
+        penalty: l2
+        solver: lbfgs
+        max_iter: 2000
+        class_weight: balanced
+  random_forest:
+    classifier_version: sklearn-random-forest-1
+    pipeline:
+      - {step: imputer, implementation: SimpleImputer, strategy: median}
+      - step: classifier
+        implementation: RandomForestClassifier
+        n_estimators: 500
+        criterion: gini
+        max_depth: null
+        min_samples_split: 2
+        min_samples_leaf: 1
+        max_features: sqrt
+        class_weight: balanced
+        n_jobs: 1
+  hist_gradient_boosting:
+    classifier_version: sklearn-hist-gradient-boosting-1
+    pipeline:
+      - {step: imputer, implementation: SimpleImputer, strategy: median}
+      - step: classifier
+        implementation: HistGradientBoostingClassifier
+        learning_rate: 0.1
+        max_iter: 200
+        max_leaf_nodes: 31
+        min_samples_leaf: 20
+        l2_regularization: 0.0
+        early_stopping: false
+scientific_constraints:
+  held_out_fitting: forbidden
+  held_out_tuning: forbidden
+  held_out_calibration: forbidden
+  model_selection: forbidden
+  feature_selection: forbidden
+  algorithmic_repetitions: 1
+  algorithmic_variability_estimated: false
+  ood_scoring: NOT_AVAILABLE

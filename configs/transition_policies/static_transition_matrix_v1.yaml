@@ -1,0 +1,104 @@
+schema_version: "1.0"
+config_type: transition_policy
+policy_id: StaticTransitionMatrixPolicy
+policy_name: static_transition_matrix
+policy_version: "1.0.0"
+protocol_id: SPLINE_TRANSITION_STUDY_V1
+state_profile: diagnostic_full_v1
+selection:
+  default_mode: argmax
+  supported_modes:
+    - argmax
+    - seeded_sampling
+  numerical_tolerance: 1.0e-9
+semantics:
+  probability_interpretation: workflow_control_probability
+  physical_degradation_probability_claim: false
+  training_or_estimation_scope: none_fixed_configuration
+matrix:
+  DATA_ACQUISITION:
+    version: "1.0.0"
+    probability_source: experimental_default
+    approval_status: protocol_static_baseline
+    rationale: Canonical workflow starts by validating acquired data.
+    transitions:
+      DATA_VALIDATION: 1.0
+  DATA_VALIDATION:
+    version: "1.0.0"
+    probability_source: experimental_default
+    approval_status: protocol_static_baseline
+    rationale: Valid data normally proceeds; failed validation may reacquire data or stop safely.
+    transitions:
+      FEATURE_EXTRACTION: 0.82
+      DATA_ACQUISITION: 0.08
+      NO_DECISION: 0.10
+  FEATURE_EXTRACTION:
+    version: "1.0.0"
+    probability_source: experimental_default
+    approval_status: protocol_static_baseline
+    rationale: Features normally flow to spline modelling; unusable features stop safely.
+    transitions:
+      SPLINE_MODELLING: 0.90
+      NO_DECISION: 0.10
+  SPLINE_MODELLING:
+    version: "1.0.0"
+    probability_source: experimental_default
+    approval_status: protocol_static_baseline
+    rationale: Spline evidence normally feeds classification; fit failure or conflict can escalate or stop safely.
+    transitions:
+      DIAGNOSTIC_INFERENCE: 0.78
+      ESCALATION: 0.12
+      NO_DECISION: 0.10
+  DIAGNOSTIC_INFERENCE:
+    version: "1.0.0"
+    probability_source: experimental_default
+    approval_status: protocol_static_baseline
+    rationale: Classifier output normally requires explanation before any decision.
+    transitions:
+      EXPLANATION_GENERATION: 0.86
+      ESCALATION: 0.14
+  EXPLANATION_GENERATION:
+    version: "1.0.0"
+    probability_source: experimental_default
+    approval_status: protocol_static_baseline
+    rationale: Explanation evidence normally proceeds to decision checking; missing support escalates or stops safely.
+    transitions:
+      DECISION_CHECK: 0.80
+      ESCALATION: 0.12
+      NO_DECISION: 0.08
+  DECISION_CHECK:
+    version: "1.0.0"
+    probability_source: experimental_default
+    approval_status: protocol_static_baseline
+    rationale: Static baseline proposes normal recommendation for supported cases while SafetyGuard retains final authority.
+    transitions:
+      RECOMMENDATION: 0.74
+      ESCALATION: 0.16
+      NO_DECISION: 0.10
+  RECOMMENDATION:
+    version: "1.0.0"
+    probability_source: specification_baseline
+    approval_status: protocol_static_baseline
+    rationale: Every recommendation must be finalized through audit.
+    transitions:
+      AUDIT: 1.0
+  ESCALATION:
+    version: "1.0.0"
+    probability_source: specification_baseline
+    approval_status: protocol_static_baseline
+    rationale: Every escalation must be finalized through audit.
+    transitions:
+      AUDIT: 1.0
+  NO_DECISION:
+    version: "1.0.0"
+    probability_source: specification_baseline
+    approval_status: protocol_static_baseline
+    rationale: Every no-decision outcome must be finalized through audit.
+    transitions:
+      AUDIT: 1.0
+  AUDIT:
+    version: "1.0.0"
+    probability_source: specification_baseline
+    approval_status: protocol_static_baseline
+    rationale: Audit is terminal for this workflow profile.
+    transitions: {}

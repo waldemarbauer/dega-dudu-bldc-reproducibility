@@ -1,0 +1,52 @@
+schema_version: "1.0"
+article_study: DUDU_BLDC_TRUSTWORTHY_AGENT_ARTICLE_V1
+component: window_temporal_representation
+representation_family: V6
+representation_id: WINDOW_TEMPORAL_SPLINE
+representation_version: "1.0.0"
+normative_runtime_role: optional_agent_input
+
+relationship_to_existing_representations:
+  V1_smoothing_spline_derivatives: unchanged_feature_index_spline
+  V2_b_spline_coefficients: unchanged_feature_index_spline
+  V3_p_spline: unchanged_feature_index_spline
+  V4_healthy_relative_spline: unchanged_feature_index_spline
+  V5_fit_selected: unchanged_validation_fit_quality_selection
+  V5_diagnostic_selected: unchanged_validation_classifier_selection
+  replacement_or_reinterpretation: false
+
+conceptual_distinction:
+  feature_index_spline:
+    observation_scope: one analytical observation
+    ordered_axis: ordered feature index
+    role: classifier representation family V1-V5
+  temporal_window_spline:
+    observation_scope: consecutive canonical windows from one acquisition
+    ordered_axis: normalized ordered-window position
+    role: optional TrendEvidence input
+    canonical_name: WINDOW_TEMPORAL_SPLINE
+
+scientific_claim_boundary:
+  supported: ordered diagnostic evolution inside one acquisition
+  unsupported:
+    - true degradation
+    - remaining useful life
+    - physical failure onset
+    - real degradation trajectory
+
+implementation:
+  contract: trustworthy_agent.trends.contracts:TrendModel
+  evidence: trustworthy_agent.evidence.trend:TrendEvidence
+  configuration: configs/trends/window_temporal_spline.yaml
+  models:
+    - RollingSmoothingSpline
+    - RollingBSpline
+    - RollingPSpline
+    - RollingHealthyRelativeSpline
+
+article_artifacts:
+  architecture: docs/window_temporal_representation.md
+  model_contract: docs/trend_models.md
+  manifest: Output/ArticleV1/Manifests/trend_model_manifest.json
+  implementation_report: Output/ArticleV1/Reports/trend_model_report.md
+  validation_report: Output/ArticleV1/Reports/trend_validation_report.md

@@ -1,0 +1,17 @@
+protocol_id: DUDU_BLDC_TRUSTWORTHY_AGENT_ARTICLE_V1
+global:
+  assignment_id: A00
+  classifier_id: random_forest
+  scoring_metric: balanced_accuracy
+  n_repeats: 30
+  random_seed: 1729
+local:
+  assignment_id: A00
+  classifier_id: logistic_regression
+  held_out_window_index: 12
+stability:
+  assignment_ids: [A00, A01, A02, A03, A04, A05, A06, A07, A08, A09, A10, A11, A12, A13, A14, A15]
+  classifier_id: random_forest
+  scoring_metric: balanced_accuracy
+  n_repeats: 30
+  random_seed: 1729

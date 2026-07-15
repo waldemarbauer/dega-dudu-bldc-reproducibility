@@ -1,0 +1,229 @@
+# Versioned palettes for the scientific-figures skill.
+#
+# Palette identifiers are immutable. If a colour definition changes, create a
+# new versioned palette instead of editing an existing identifier.
+#
+# Transparency, line styles, marker styles, and line widths do not belong in
+# this file. They are resolved from figure configuration and style profiles.
+
+schema_version: 1
+
+defaults:
+  sequential_palette: blue_ribbon_v1
+  uncertainty_palette: blue_ribbon_v1
+  highlight_palette: yellow_ribbon_v1
+  neutral_palette: neutral_v1
+  background: light
+
+palettes:
+  blue_ribbon_v1:
+    type: sequential
+    status: stable
+    background_assumption: light
+    description: >
+      Default ordered blue palette for scientific figures, uncertainty
+      ribbons, and primary-versus-context visual hierarchy.
+
+    colors:
+      light: "#B3FFFF"
+      light_highlight: "#9AF6FF"
+      mid: "#67C3FF"
+      mid_highlight: "#3490CC"
+      dark: "#015D99"
+      dark_highlight: "#002A66"
+
+    semantic_roles:
+      outer_interval_fill: light
+      intermediate_interval_fill: light_highlight
+      inner_interval_fill: mid
+      contextual_fill: light_highlight
+      contextual_line: mid_highlight
+      secondary_line: mid_highlight
+      primary_line: dark
+      primary_emphasis: dark_highlight
+      marker_edge: dark
+      direct_label: dark_highlight
+
+    usage:
+      suitable_for:
+        - uncertainty_fills
+        - ordered_emphasis
+        - primary_lines
+        - secondary_lines
+        - direct_labels
+        - grayscale_reproduction
+
+      text_on_light_background:
+        allowed:
+          - dark
+          - dark_highlight
+        avoid:
+          - light
+          - light_highlight
+          - mid
+          - mid_highlight
+
+      thin_lines_on_light_background:
+        preferred:
+          - dark
+          - dark_highlight
+        conditional:
+          - mid_highlight
+        avoid:
+          - light
+          - light_highlight
+          - mid
+
+      fills_on_light_background:
+        preferred:
+          - light
+          - light_highlight
+          - mid
+
+      restrictions:
+        - Do not treat adjacent ribbon shades as independent categorical colours.
+        - Do not use light tones for small text or thin lines.
+        - Validate transparency after compositing against the actual background.
+
+  yellow_ribbon_v1:
+    type: sequential
+    status: stable
+    background_assumption: light
+    description: >
+      Optional secondary palette for highlights, warning regions, contextual
+      ribbons, and selected graphical areas. It is not the default line or
+      text palette on a white background.
+
+    colors:
+      light: "#FFFFAA"
+      light_highlight: "#FFFF44"
+      mid: "#FDED2A"
+      mid_highlight: "#FFE41C"
+      dark: "#EECA02"
+      dark_highlight: "#D5B100"
+
+    semantic_roles:
+      outer_highlight_fill: light
+      inner_highlight_fill: light_highlight
+      contextual_highlight_fill: mid
+      warning_fill: mid_highlight
+      highlight_marker_fill: dark
+      highlight_emphasis_fill: dark_highlight
+
+    usage:
+      suitable_for:
+        - secondary_highlights
+        - warning_regions
+        - contextual_ribbons
+        - filled_markers_with_dark_edges
+
+      text_on_light_background:
+        allowed: []
+        avoid:
+          - light
+          - light_highlight
+          - mid
+          - mid_highlight
+          - dark
+          - dark_highlight
+
+      thin_lines_on_light_background:
+        preferred: []
+        conditional:
+          - dark
+          - dark_highlight
+        avoid:
+          - light
+          - light_highlight
+          - mid
+          - mid_highlight
+
+      fills_on_light_background:
+        preferred:
+          - light
+          - light_highlight
+          - mid
+          - mid_highlight
+          - dark
+          - dark_highlight
+
+      restrictions:
+        - Use a dark outline for small yellow markers on a light background.
+        - Do not use yellow as the sole warning or status encoding.
+        - Do not use yellow tones for normal text on a white background.
+        - Validate blue-yellow combinations in grayscale and colour-vision simulations.
+
+  neutral_v1:
+    type: neutral
+    status: stable
+    background_assumption: light
+    description: >
+      Neutral colours for text, axes, grids, contextual elements, outlines,
+      and de-emphasized scientific content.
+
+    colors:
+      white: "#FFFFFF"
+      near_white: "#F5F5F5"
+      light: "#D9D9D9"
+      mid: "#8C8C8C"
+      dark: "#4D4D4D"
+      near_black: "#1A1A1A"
+      black: "#000000"
+
+    semantic_roles:
+      figure_background: white
+      axes_background: white
+      subtle_background: near_white
+      subtle_grid: light
+      contextual_line: mid
+      reference_line: mid
+      axes_and_spines: dark
+      general_text: near_black
+      marker_edge: near_black
+      strong_outline: black
+
+    usage:
+      suitable_for:
+        - text
+        - axes
+        - spines
+        - grids
+        - reference_lines
+        - contextual_series
+        - marker_outlines
+        - light_backgrounds
+
+      restrictions:
+        - Validate contextual grey elements at target size.
+        - Do not make relevant context so light that it disappears in print.
+        - Use near-black rather than pure black when lower visual emphasis is sufficient.
+
+accessibility:
+  required_checks:
+    - target_size_review
+    - grayscale
+    - deuteranopia_or_deuteranomaly
+    - protanopia_or_protanomaly
+
+  conditional_checks:
+    - tritanopia_or_tritanomaly
+    - black_and_white_print
+    - projection
+    - compressed_video
+    - dark_background
+
+  rules:
+    color_only_encoding: forbidden
+    semantic_mapping_must_be_stable: true
+    custom_palette_requires_validation: true
+    failed_required_check_blocks_finalization: true
+    user_exception_must_be_documented: true
+
+  preferred_redundant_encodings:
+    - line_style
+    - marker_shape
+    - marker_edge
+    - line_width
+    - direct_label
+    - annotation
+    - spatial_separation

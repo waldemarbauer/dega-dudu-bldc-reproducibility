@@ -1,0 +1,50 @@
+schema_version: "1.0"
+config_type: transition_policy
+policy_id: BayesianMCMCTransitionPolicy
+policy_name: bayesian_mcmc_transition_policy
+policy_version: "1.0.0"
+protocol_id: SPLINE_TRANSITION_STUDY_V1
+state_profile: diagnostic_full_v1
+selection:
+  default_mode: argmax
+  supported_modes:
+    - argmax
+    - seeded_sampling
+semantics:
+  probability_interpretation: workflow_control_probability
+  physical_degradation_probability_claim: false
+  remaining_useful_life_claim: false
+backend:
+  implementation: pymc
+  sampler: NUTS
+  dependency_group: mcmc
+covariates:
+  - data_quality
+  - missing_ratio
+  - confidence
+  - model_agreement
+  - representation_agreement
+  - explanation_score
+  - domain_consistency_score
+  - risk_score
+  - slope
+  - curvature
+  - distance_from_healthy
+  - ood_score
+priors:
+  prior_version: transition_mnlogit_priors_v1
+  alpha:
+    family: Normal
+    mu: 0.0
+    sigma: 1.0
+    rationale: weakly_regularizing_state_intercepts
+  beta:
+    family: Normal
+    mu: 0.0
+    sigma: 0.75
+    rationale: weakly_regularizing_covariate_effects
+diagnostic_pass_criteria:
+  max_r_hat_lte: 1.01
+  divergence_count_eq: 0
+  minimum_ess_gte: 50
+  posterior_predictive_finite_normalized: true

@@ -1,0 +1,22 @@
+schema_version: "1.0"
+config_type: transition_policy
+policy_id: DeterministicPosteriorApproximationPolicy
+policy_name: deterministic_posterior_approximation
+policy_version: "1.0.0"
+protocol_id: SPLINE_TRANSITION_STUDY_V1
+state_profile: diagnostic_full_v1
+selection:
+  default_mode: argmax
+  supported_modes:
+    - argmax
+    - seeded_sampling
+semantics:
+  probability_interpretation: workflow_control_probability
+  physical_degradation_probability_claim: false
+  remaining_useful_life_claim: false
+approximation:
+  approximation_method: deterministic_laplace_style_posterior_surrogate
+  no_sampling: true
+  nuts_sampler_executed: false
+  mcmc_diagnostics_available: false
+  allowed_use: auxiliary_transition_policy_ablation_baseline

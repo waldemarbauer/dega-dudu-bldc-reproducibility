@@ -1,0 +1,66 @@
+schema_version: "1.0.0"
+config_type: article_evidence_contract
+article_study: DUDU_BLDC_TRUSTWORTHY_AGENT_ARTICLE_V1
+contract_id: AGENT_DIAGNOSTIC_EVIDENCE
+contract_version: "1.0.0"
+
+required_chain:
+  - WindowPrediction
+  - WindowEvidence
+  - AcquisitionEvidence
+  - PersistedTrendEvidence
+  - RiskEvidence
+  - SafetyEvidence
+  - AgentContext
+  - FSM
+
+provenance_fields:
+  - schema_version
+  - creation_timestamp
+  - creator_component
+  - input_hashes
+  - configuration_hash
+  - assignment_id
+  - partition
+  - model_hash
+  - representation_hash
+  - healthy_reference_hash
+
+optional_only_when_scientifically_inapplicable:
+  - healthy_reference_hash
+
+natural_scenario_policy:
+  source_kind: natural
+  evidence_mode: persisted_only
+  configured_diagnostic_facts_allowed: false
+  missing_artifact_behavior: fail_closed
+
+fixture_policy:
+  allowed_scopes:
+    - unit_test
+    - synthetic_fixture
+    - controlled_failure_injection
+    - controlled_constructed_scenario
+  must_record_source_kind: true
+
+rejection_codes:
+  - EVIDENCE_ARTIFACT_MISSING
+  - EVIDENCE_MISSING_ASSIGNMENT
+  - EVIDENCE_MIXED_ASSIGNMENTS
+  - EVIDENCE_MIXED_ACQUISITIONS
+  - EVIDENCE_MIXED_PARTITIONS
+  - EVIDENCE_MIXED_MODELS
+  - EVIDENCE_MIXED_REPRESENTATIONS
+  - EVIDENCE_SCHEMA_VERSION_MISMATCH
+  - EVIDENCE_UNKNOWN_PROVENANCE
+  - EVIDENCE_LABEL_LEAKAGE
+  - EVIDENCE_TREND_NOT_USABLE
+
+protected_boundaries:
+  - semantic_fsm
+  - transition_algorithms
+  - SafetyGuard
+  - classifier_training
+  - V1_V6_representations
+  - TrendModel
+  - audit_pipeline

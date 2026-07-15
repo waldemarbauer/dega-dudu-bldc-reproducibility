@@ -1,0 +1,167 @@
+schema_version: "1.0"
+config_type: trend_representation
+representation_family: V6
+representation_id: WINDOW_TEMPORAL_SPLINE
+representation_version: "1.0.0"
+status: optional_agent_input
+
+scientific_semantics:
+  scope: ordered_diagnostic_evolution_within_one_acquisition
+  axis: normalized_ordered_window_position
+  permitted_terms:
+    - ordered diagnostic windows
+    - observed window history
+    - ordered diagnostic evolution
+  forbidden_claims:
+    - true_degradation
+    - remaining_useful_life
+    - physical_failure_onset
+    - real_degradation_trajectory
+
+input_contract:
+  require_single_acquisition: true
+  require_single_assignment: true
+  require_strict_window_order: true
+  reject_duplicate_window_ids: true
+  reject_duplicate_window_orders: true
+  require_timestamp_or_ordinal_position: true
+  require_finite_feature_vectors: true
+  online_future_windows: forbidden
+  fields:
+    - acquisition_id
+    - window_id
+    - window_order
+    - assignment_id
+    - partition
+    - features
+    - timestamp_or_ordinal_position
+
+defaults:
+  mode: OFFLINE
+  min_windows: 4
+  degree: 3
+  feature_reduction: l2_norm
+
+parameter_provenance:
+  min_windows:
+    status: experimental_default
+    source: DUDU_BLDC_TRUSTWORTHY_AGENT_ARTICLE_V1_design
+  degree:
+    status: method_configuration
+    source: declared_V6_configuration
+  feature_reduction:
+    status: experimental_default
+    source: declared_V6_configuration
+
+models:
+  RollingSmoothingSpline:
+    enabled: true
+    version: "1.0.0"
+    implementation: trustworthy_agent.trends.models:RollingSmoothingSpline
+    parameters:
+      smoothing_factor: 0.25
+    parameter_provenance:
+      smoothing_factor:
+        status: experimental_default
+        source: declared_V6_configuration
+
+  RollingBSpline:
+    enabled: true
+    version: "1.0.0"
+    implementation: trustworthy_agent.trends.models:RollingBSpline
+    parameters:
+      basis_count: 6
+    parameter_provenance:
+      basis_count:
+        status: experimental_default
+        source: declared_V6_configuration
+
+  RollingPSpline:
+    enabled: true
+    version: "1.0.0"
+    implementation: trustworthy_agent.trends.models:RollingPSpline
+    parameters:
+      basis_count: 6
+      penalty_lambda: 10.0
+      difference_order: 2
+    parameter_provenance:
+      basis_count:
+        status: experimental_default
+        source: declared_V6_configuration
+      penalty_lambda:
+        status: experimental_default
+        source: Eilers_and_Marx_1996_method_family_not_dataset_tuned
+      difference_order:
+        status: experimental_default
+        source: declared_V6_configuration
+
+  RollingHealthyRelativeSpline:
+    enabled: true
+    version: "1.0.0"
+    implementation: trustworthy_agent.trends.models:RollingHealthyRelativeSpline
+    parameters:
+      smoothing_factor: 0.25
+    parameter_provenance:
+      smoothing_factor:
+        status: experimental_default
+        source: declared_V6_configuration
+
+healthy_reference:
+  optional_for:
+    - RollingSmoothingSpline
+    - RollingBSpline
+    - RollingPSpline
+  required_for:
+    - RollingHealthyRelativeSpline
+  required_source_partition: train
+  require_active_assignment_match: true
+  reject_validation: true
+  reject_test: true
+  reject_mixed_partitions: true
+  reject_unknown_provenance: true
+
+output_contract:
+  schema: TrendEvidence
+  mandatory_fields:
+    - trend_value
+    - first_derivative
+    - second_derivative
+    - curvature
+    - maximum_curvature
+    - healthy_distance
+    - fit_rmse
+    - roughness
+    - effective_degrees_of_freedom
+    - uncertainty
+    - window_count
+    - fit_status
+    - representation_id
+    - representation_version
+    - configuration_hash
+    - input_window_hashes
+  required_failure_context:
+    - reason
+    - metadata
+    - provenance
+
+failure_policy:
+  silent_zero_fill: false
+  statuses:
+    - FIT_OK
+    - INSUFFICIENT_HISTORY
+    - NONFINITE_INPUT
+    - UNORDERED_WINDOWS
+    - MIXED_ACQUISITIONS
+    - UNKNOWN_HEALTHY_REFERENCE
+    - NUMERICAL_FAILURE
+    - INVALID_CONFIGURATION
+  rejection_reasons:
+    duplicate_window: DUPLICATE_WINDOW_ID_or_DUPLICATE_WINDOW_ORDER
+    future_window: FUTURE_WINDOW_FORBIDDEN
+
+persistence:
+  format: deterministic_json
+  unsafe_pickle: forbidden
+  include_configuration_hash: true
+  include_input_window_hashes: true
+  include_metadata: true

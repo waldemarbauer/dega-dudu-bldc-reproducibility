@@ -1,0 +1,75 @@
+schema_version: "1.0.0"
+protocol_id: DUDU_BLDC_TRUSTWORTHY_AGENT_ARTICLE_V1_E1_4
+article_study: DUDU_BLDC_TRUSTWORTHY_AGENT_ARTICLE_V1
+evidence_schema_version: "1.0.0"
+creation_timestamp: "2026-07-14T00:00:00Z"
+frozen_inputs:
+  feature_schema_hash: cc0ad021582e9279227ed5c4dec085ea565194e384402b56a7b70d5afb9e8fde
+  feature_corpus_sha256: 0d3041370ad4e7824a610dd0ca42140d0a3d2b6d41ec4306caf886a2ee874ecf
+  classifier_prediction_manifest_sha256: 19352be4de7eee0b14d563a6f1d452ce60f8d2d58e37bd336df81d4eda7d9a29
+  assignment_catalog_sha256: fc14ef940931581ad4400e5ef398227530af3a52242969e60130e199bc6ecdfd
+  healthy_source_catalog_sha256: 154784f2b19360aaf2d0e3cc1981c6c97e4e4379255dc26e48bf8e8388395aa9
+  trend_configuration_sha256: 3b89c0401490af40930f92884c0b394fa5865429d45b8a662c298694cbe8b847
+  r3_evidence_configuration_sha256: 7c4392c3156e474ad74311cc3fd7d74b4fab8bb92238648da5091bac32de739f
+canonical_class_order:
+  - Healthy
+  - Mech_Damage
+  - Elec_Damage
+  - Mech_Elec_Damage
+partition_adapter:
+  source: held_out
+  r3_v6_target: test
+  membership_change_allowed: false
+ood_deviation:
+  configuration: configs/ood/article_v1/training_distribution_deviation_v1.yaml
+  method_id: TRAINING_DISTRIBUTION_DEVIATION_V1
+  scientific_status: OOD_SURROGATE_NOT_EXTERNALLY_VALIDATED
+healthy_reference:
+  method: per_feature_mean_and_population_standard_deviation
+  zero_scale_rule: replace_with_one
+  source_partition: train
+  rows_per_assignment: 25
+v6:
+  configuration: configs/trends/window_temporal_spline.yaml
+  operating_mode: OFFLINE
+  models:
+    - RollingSmoothingSpline
+    - RollingBSpline
+    - RollingPSpline
+    - RollingHealthyRelativeSpline
+  trend_input_adapter:
+    ordering_field: window_index_within_acquisition
+    source_field: window_order
+    feature_vector_field: ordered_feature_values
+    reducer: l2_norm
+    derivative_axis: normalized_ordered_window_position
+    physical_time_interpretation: forbidden
+acquisition_aggregation:
+  strategy: mean_probability
+risk_evidence:
+  source_configuration: configs/article/evidence_pipeline.yaml
+  weights:
+    classifier_uncertainty: 0.25
+    trend_uncertainty: 0.20
+    ood_contribution: 0.20
+    healthy_deviation: 0.20
+    conflict: 0.15
+  normalization:
+    trend_uncertainty_scale: 1.0
+    healthy_deviation_scale: 3.0
+    conflict_healthy_deviation_threshold: 0.5
+evidence_bundle:
+  schema_version: "1.0.0"
+  scenario_id: ARTICLE_V1_UNSELECTED_EVIDENCE_POOL
+determinism:
+  acquisition_tie_break: canonical_acquisition_id_ascending
+  seed: null
+execution_boundaries:
+  classifier_fit_count: 0
+  classifier_inference_count: 0
+  fsm_execution_count: 0
+  transition_policy_execution_count: 0
+  safety_guard_decision_execution_count: 0
+  scenario_execution_count: 0
+  agent_execution_count: 0
+

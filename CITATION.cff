@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the accompanying manuscript and the DUDU-BLDC dataset."
+title: "DEGA DUDU-BLDC reproducibility code"
+type: software
+version: "1.0.0"
+authors:
+  - family-names: "Bauer"
+    given-names: "Waldemar"
+  - family-names: "Jarzyna"
+    given-names: "Kacper"
+  - family-names: "Piątek"
+    given-names: "Agnieszka"
+  - family-names: "Ziemba"
+    given-names: "Miłosz"
+  - family-names: "Baranowski"
+    given-names: "Jerzy"
+preferred-citation:
+  type: article
+  title: "DEGA: A Deterministic Diagnostic Evidence Governance Agent for Industrial IoT—A DUDU-BLDC Case Study"
+  authors:
+    - family-names: "Bauer"
+      given-names: "Waldemar"
+    - family-names: "Jarzyna"
+      given-names: "Kacper"
+    - family-names: "Piątek"
+      given-names: "Agnieszka"
+    - family-names: "Ziemba"
+      given-names: "Miłosz"
+    - family-names: "Baranowski"
+      given-names: "Jerzy"
+  journal: "Information"
+  year: 2026
+  notes: "Manuscript version dated July 15, 2026; final publication metadata not asserted here."

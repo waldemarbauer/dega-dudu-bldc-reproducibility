@@ -1,0 +1,202 @@
+schema_version: "1.0"
+config_type: expert_rule_profile
+rule_profile_id: spline_transition_study_v1_static_rules
+rule_profile_version: "1.0.0"
+protocol_id: SPLINE_TRANSITION_STUDY_V1
+state_profile: diagnostic_full_v1
+threshold_policy:
+  scientific_validation_claim: false
+  default_threshold_status: experimental_default
+rules:
+  - rule_id: R1_NO_INPUT
+    rule_version: "1.0.0"
+    priority: 10
+    description: Input evidence must exist before diagnosis or recommendation.
+    required_context_fields: [input_available]
+    trigger: input_available == false
+    threshold_values: {}
+    threshold_status: not_applicable
+    threshold_source: specification_baseline
+    allowed_outcomes: [NO_DECISION]
+    reason_code: NO_INPUT_AVAILABLE
+    audit_fields: [input_hash, case_id, current_state]
+  - rule_id: R2_POOR_DATA_QUALITY
+    rule_version: "1.0.0"
+    priority: 20
+    description: Poor or incomplete data cannot produce a normal recommendation.
+    required_context_fields: [data_quality, missing_ratio]
+    trigger: data_quality < min_data_quality or missing_ratio > max_missing_ratio
+    threshold_values: {min_data_quality: 0.75, max_missing_ratio: 0.10}
+    threshold_status: experimental_default
+    threshold_source: expert_hypothesis
+    allowed_outcomes: [NO_DECISION, REQUEST_NEW_DATA]
+    reason_code: POOR_DATA_QUALITY
+    audit_fields: [data_quality, missing_ratio]
+  - rule_id: R3_INVALID_SPLINE_FIT
+    rule_version: "1.0.0"
+    priority: 30
+    description: Invalid spline fit blocks normal automatic recommendation.
+    required_context_fields: [spline_fit_valid]
+    trigger: spline_fit_valid == false
+    threshold_values: {}
+    threshold_status: not_applicable
+    threshold_source: specification_baseline
+    allowed_outcomes: [NO_DECISION, ESCALATION]
+    reason_code: INVALID_SPLINE_FIT
+    audit_fields: [spline_fit_valid, spline_summary]
+  - rule_id: R4_MODEL_ARTIFACT_INVALID
+    rule_version: "1.0.0"
+    priority: 40
+    description: Model, schema, split, or representation hash mismatch blocks inference.
+    required_context_fields: [model_artifact_valid]
+    trigger: model_artifact_valid == false
+    threshold_values: {}
+    threshold_status: not_applicable
+    threshold_source: specification_baseline
+    allowed_outcomes: [NO_DECISION]
+    reason_code: MODEL_ARTIFACT_INVALID
+    audit_fields: [model_hash, representation_hash, feature_schema_hash, split_hash]
+  - rule_id: R5_LOW_CONFIDENCE
+    rule_version: "1.0.0"
+    priority: 50
+    description: Low confidence cannot produce a normal automatic recommendation.
+    required_context_fields: [confidence]
+    trigger: confidence < min_confidence
+    threshold_values: {min_confidence: 0.70}
+    threshold_status: experimental_default
+    threshold_source: expert_hypothesis
+    allowed_outcomes: [ESCALATION, NO_DECISION]
+    reason_code: LOW_CONFIDENCE
+    audit_fields: [confidence]
+  - rule_id: R6_SPLINE_CLASSIFIER_CONFLICT
+    rule_version: "1.0.0"
+    priority: 60
+    description: Conflict between spline evidence and classifier outcome requires escalation.
+    required_context_fields: [spline_classifier_conflict]
+    trigger: spline_classifier_conflict == true
+    threshold_values: {}
+    threshold_status: not_applicable
+    threshold_source: specification_baseline
+    allowed_outcomes: [ESCALATION]
+    reason_code: SPLINE_CLASSIFIER_CONFLICT
+    audit_fields: [spline_summary, diagnosis, class_probabilities]
+  - rule_id: R7_REPRESENTATION_DISAGREEMENT
+    rule_version: "1.0.0"
+    priority: 70
+    description: Large disagreement across representations escalates under the static baseline.
+    required_context_fields: [representation_disagreement]
+    trigger: representation_disagreement > max_representation_disagreement
+    threshold_values: {max_representation_disagreement: 0.35}
+    threshold_status: experimental_default
+    threshold_source: expert_hypothesis
+    allowed_outcomes: [ESCALATION]
+    reason_code: REPRESENTATION_DISAGREEMENT
+    audit_fields: [representation_disagreement]
+  - rule_id: R8_CLASSIFIER_DISAGREEMENT
+    rule_version: "1.0.0"
+    priority: 80
+    description: Large disagreement across classifiers escalates under the static baseline.
+    required_context_fields: [classifier_disagreement]
+    trigger: classifier_disagreement > max_classifier_disagreement
+    threshold_values: {max_classifier_disagreement: 0.35}
+    threshold_status: experimental_default
+    threshold_source: expert_hypothesis
+    allowed_outcomes: [ESCALATION]
+    reason_code: CLASSIFIER_DISAGREEMENT
+    audit_fields: [classifier_disagreement]
+  - rule_id: R9_MISSING_EXPLANATION
+    rule_version: "1.0.0"
+    priority: 90
+    description: Missing required explanation blocks automatic recommendation.
+    required_context_fields: [explanation_available, explanation_score]
+    trigger: explanation_required == true and (explanation_available == false or explanation_score < min_explanation_score)
+    threshold_values: {min_explanation_score: 0.70}
+    threshold_status: experimental_default
+    threshold_source: expert_hypothesis
+    allowed_outcomes: [ESCALATION, NO_DECISION]
+    reason_code: MISSING_EXPLANATION
+    audit_fields: [explanation_available, explanation_score]
+  - rule_id: R10_LOW_DOMAIN_CONSISTENCY
+    rule_version: "1.0.0"
+    priority: 100
+    description: Low domain-rule consistency blocks unsupported automatic recommendation.
+    required_context_fields: [domain_consistency_score]
+    trigger: domain_consistency_score < min_domain_consistency_score
+    threshold_values: {min_domain_consistency_score: 0.60}
+    threshold_status: experimental_default
+    threshold_source: expert_hypothesis
+    allowed_outcomes: [ESCALATION, NO_DECISION]
+    reason_code: LOW_DOMAIN_CONSISTENCY
+    audit_fields: [domain_consistency_score]
+  - rule_id: R11_HIGH_RISK
+    rule_version: "1.0.0"
+    priority: 110
+    description: High-risk unsupported cases require safe escalation.
+    required_context_fields: [risk_score]
+    trigger: risk_score > max_risk_for_auto_recommendation
+    threshold_values: {max_risk_for_auto_recommendation: 0.60}
+    threshold_status: experimental_default
+    threshold_source: expert_hypothesis
+    allowed_outcomes: [ESCALATION]
+    reason_code: HIGH_RISK_ESCALATION
+    audit_fields: [risk_score]
+  - rule_id: R12_COMBINED_FAULT_EXPERT_REVIEW
+    rule_version: "1.0.0"
+    priority: 120
+    description: Combined mechanical-electrical fault requires at least expert review.
+    required_context_fields: [diagnosis]
+    trigger: diagnosis == Mech_Elec_Damage
+    threshold_values: {}
+    threshold_status: not_applicable
+    threshold_source: specification_baseline
+    allowed_outcomes: [ESCALATION]
+    reason_code: COMBINED_FAULT_EXPERT_REVIEW
+    audit_fields: [diagnosis]
+  - rule_id: R13_OOD
+    rule_version: "1.0.0"
+    priority: 130
+    description: Out-of-distribution evidence escalates or produces no decision.
+    required_context_fields: [ood_score]
+    trigger: ood_score > max_ood_score
+    threshold_values: {max_ood_score: 0.50}
+    threshold_status: experimental_default
+    threshold_source: expert_hypothesis
+    allowed_outcomes: [ESCALATION, NO_DECISION]
+    reason_code: OOD_ESCALATION
+    audit_fields: [ood_score]
+  - rule_id: R14_AUDIT_WRITE_FAILURE
+    rule_version: "1.0.0"
+    priority: 140
+    description: Audit write failure fails closed.
+    required_context_fields: [audit_available]
+    trigger: audit_available == false
+    threshold_values: {}
+    threshold_status: not_applicable
+    threshold_source: specification_baseline
+    allowed_outcomes: [NO_DECISION]
+    reason_code: AUDIT_WRITE_FAILURE
+    audit_fields: [audit_available]
+  - rule_id: R15_AUDIT_CHAIN_FAILURE
+    rule_version: "1.0.0"
+    priority: 150
+    description: Invalid audit hash chain fails closed.
+    required_context_fields: [audit_chain_valid]
+    trigger: audit_chain_valid == false
+    threshold_values: {}
+    threshold_status: not_applicable
+    threshold_source: specification_baseline
+    allowed_outcomes: [NO_DECISION]
+    reason_code: AUDIT_CHAIN_FAILURE
+    audit_fields: [audit_chain_valid]
+  - rule_id: R16_INVALID_TRANSITION
+    rule_version: "1.0.0"
+    priority: 160
+    description: Invalid profile transition is rejected.
+    required_context_fields: [allowed_transitions, selected_state_before_safety]
+    trigger: selected_state_before_safety not in allowed_transitions
+    threshold_values: {}
+    threshold_status: not_applicable
+    threshold_source: specification_baseline
+    allowed_outcomes: [NO_DECISION]
+    reason_code: INVALID_TRANSITION
+    audit_fields: [current_state, allowed_transitions, selected_state_before_safety]

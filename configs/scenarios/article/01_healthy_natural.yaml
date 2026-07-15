@@ -1,0 +1,28 @@
+schema_version: "1.0.0"
+config_type: article_persisted_evidence_scenario
+scenario_id: ARTICLE_SCENARIO_01_NATURAL_HEALTHY
+scenario_version: "1.0.0"
+title: Natural monitoring case from persisted diagnostic evidence
+
+source:
+  dataset: DUDU-BLDC
+  record_id: 15522163
+  dataset_version: v1
+  source_kind: natural
+  selection_basis: pre_registered_persisted_evidence_identity
+
+evidence_source:
+  mode: persisted_only
+  bundle_path: Output/ArticleV1/Evidence/ARTICLE_SCENARIO_01_NATURAL_HEALTHY.json
+  required_evidence:
+    - WindowEvidence
+    - AcquisitionEvidence
+    - TrendEvidence
+    - RiskEvidence
+    - SafetyEvidence
+  configured_diagnostic_facts_allowed: false
+
+runtime:
+  state_profile: diagnostic_full_v1
+  safety_guard_authoritative: true
+  audit_required: true

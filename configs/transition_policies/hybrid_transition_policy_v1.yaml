@@ -1,0 +1,30 @@
+schema_version: "1.0"
+config_type: transition_policy
+policy_id: HybridTransitionPolicy
+policy_name: hybrid_transition_policy
+policy_version: "1.0.0"
+protocol_id: SPLINE_TRANSITION_STUDY_V1
+state_profile: diagnostic_full_v1
+selection:
+  default_mode: argmax
+  supported_modes:
+    - argmax
+    - seeded_sampling
+  numerical_tolerance: 1.0e-9
+composition:
+  static_policy_config: configs/transition_policies/static_transition_matrix_v1.yaml
+  bayesian_policy_config: configs/transition_policies/bayesian_mcmc_transition_policy_v1.yaml
+  blend_rule: static_probabilities_blended_with_bayesian_posterior_mean
+  blend_weight_source: posterior_confidence
+  minimum_posterior_confidence: 0.20
+  fallback: static_policy
+  fallback_rules:
+    invalid_mcmc_diagnostics: static_policy
+    high_posterior_entropy: escalation_or_no_decision
+    terminal_hdi_overlap: escalation
+    static_mcmc_terminal_disagreement: safetyguard_visible_conflict_evidence
+semantics:
+  safety_guard_external_and_authoritative: true
+  probability_interpretation: workflow_control_probability
+  physical_degradation_probability_claim: false
+  remaining_useful_life_claim: false

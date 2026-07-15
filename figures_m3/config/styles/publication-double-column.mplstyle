@@ -1,0 +1,64 @@
+# Common publication defaults are duplicated intentionally because Matplotlib
+# style files do not provide a reliable inheritance mechanism.
+
+font.family: sans-serif
+font.sans-serif: DejaVu Sans
+mathtext.fontset: dejavusans
+text.usetex: False
+
+figure.facecolor: white
+axes.facecolor: white
+
+text.color: 0.10
+axes.labelcolor: 0.10
+axes.edgecolor: 0.30
+xtick.color: 0.20
+ytick.color: 0.20
+
+axes.spines.top: False
+axes.spines.right: False
+axes.axisbelow: True
+axes.grid: False
+legend.frameon: False
+legend.fancybox: False
+
+lines.antialiased: True
+lines.solid_capstyle: round
+lines.dash_capstyle: round
+patch.edgecolor: 0.25
+patch.force_edgecolor: False
+
+xtick.direction: out
+ytick.direction: out
+xtick.minor.visible: False
+ytick.minor.visible: False
+axes.formatter.use_mathtext: True
+axes.unicode_minus: True
+
+# Publication: double-column figure.
+font.size: 8.5
+axes.labelsize: 8.5
+axes.titlesize: 8.5
+xtick.labelsize: 7.5
+ytick.labelsize: 7.5
+legend.fontsize: 7.5
+figure.titlesize: 9.0
+
+axes.linewidth: 0.80
+lines.linewidth: 1.30
+lines.markersize: 4.80
+patch.linewidth: 0.80
+
+xtick.major.size: 3.2
+xtick.major.width: 0.75
+ytick.major.size: 3.2
+ytick.major.width: 0.75
+xtick.major.pad: 2.8
+ytick.major.pad: 2.8
+
+axes.labelpad: 3.5
+axes.titlepad: 4.5
+legend.handlelength: 1.9
+legend.handletextpad: 0.55
+legend.columnspacing: 0.9
+errorbar.capsize: 2.2

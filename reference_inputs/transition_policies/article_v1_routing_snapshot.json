@@ -1,0 +1,57 @@
+{
+  "expected_representative_e2_outcomes": {
+    "distinct_state_paths": 2,
+    "escalations": 3,
+    "no_decision_outcomes": 9,
+    "recommendations": 0,
+    "run_count": 12,
+    "safetyguard_overrides": 3
+  },
+  "policies": {
+    "BayesianMCMCTransitionPolicy": {
+      "policy_version": "1.0.0",
+      "routing": {
+        "DATA_ACQUISITION": {
+          "DATA_VALIDATION": 1.0
+        },
+        "DATA_VALIDATION": {
+          "DATA_ACQUISITION": 1.5280053811192434e-08,
+          "FEATURE_EXTRACTION": 1.5280053811192434e-08,
+          "NO_DECISION": 0.9999999694398916
+        },
+        "NO_DECISION": {
+          "AUDIT": 1.0
+        }
+      }
+    },
+    "HybridTransitionPolicy": {
+      "policy_version": "1.0.0",
+      "routing": {
+        "DATA_ACQUISITION": {
+          "DATA_VALIDATION": 1.0
+        },
+        "DATA_VALIDATION": {
+          "DATA_ACQUISITION": 5.755459429182429e-08,
+          "FEATURE_EXTRACTION": 4.485941684264904e-07,
+          "NO_DECISION": 0.9999994938512372
+        },
+        "NO_DECISION": {
+          "AUDIT": 1.0
+        }
+      }
+    }
+  },
+  "purpose": "Compact publication-replay input reconstructed from the persisted E2 audit records. It reproduces the ArticleV1 routing decisions for BayesianMCMCTransitionPolicy and HybridTransitionPolicy when the historical posterior_trace.nc is unavailable.",
+  "schema_version": "1.0.0",
+  "scientific_boundary": "This snapshot reproduces the representative ArticleV1 DEGA executions only; it does not re-fit the historical PyMC/NUTS transition model and must not be presented as a new MCMC fit.",
+  "snapshot_id": "ARTICLE_V1_PUBLICATION_ROUTING_SNAPSHOT_V1",
+  "source_audit_sha256": {
+    "Output/ArticleV1/AgentRuns/MinimalE2/ARTICLE_SCENARIO_01_NATURAL_HEALTHY__BayesianMCMCTransitionPolicy/audit.jsonl": "50545cbde021e0bc071940fc800f413d0288a4bca995478653ac9d8be04d774b",
+    "Output/ArticleV1/AgentRuns/MinimalE2/ARTICLE_SCENARIO_01_NATURAL_HEALTHY__HybridTransitionPolicy/audit.jsonl": "9e4b915bb03994e2afec1bc88bcfe662c0de36d2485af96f8130a0697abf51bb",
+    "Output/ArticleV1/AgentRuns/MinimalE2/ARTICLE_SCENARIO_03_NATURAL_HIGH_RISK__BayesianMCMCTransitionPolicy/audit.jsonl": "79ed89375f20ea1be33efa2d4647245b0192d14922a3c5bf08156000deb5d348",
+    "Output/ArticleV1/AgentRuns/MinimalE2/ARTICLE_SCENARIO_03_NATURAL_HIGH_RISK__HybridTransitionPolicy/audit.jsonl": "b0a46a65ac4c208bc16839bf6f47d01156d47ea22bd73072d49971b1630e12a2",
+    "Output/ArticleV1/AgentRuns/MinimalE2/ARTICLE_SCENARIO_05_NATURAL_CONFLICT_CANDIDATE__BayesianMCMCTransitionPolicy/audit.jsonl": "592337ef06806cfa1750a9358d2375864b3242bb1f3351ff86d09482940bd8eb",
+    "Output/ArticleV1/AgentRuns/MinimalE2/ARTICLE_SCENARIO_05_NATURAL_CONFLICT_CANDIDATE__HybridTransitionPolicy/audit.jsonl": "fd7db81161909dd205bb553d97f09c799dbf04498616348967f2d2c9db655636"
+  },
+  "source_repository_commit": "a6887b14c1630cca44d455f14e4b05c79be7097d"
+}

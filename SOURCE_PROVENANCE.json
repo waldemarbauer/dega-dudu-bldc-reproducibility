@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0.0",
+  "publication_repository_name": "dega-dudu-bldc-reproducibility",
+  "source_zip_filename": "trustworthy_agent-agent_v2 (1).zip",
+  "source_zip_sha256": "34cb2a9e2a9cee56366ffdf3a67ee12e698edcc89b1fce236e5ae0467174b321",
+  "source_repository_commit_from_zip_metadata": "a6887b14c1630cca44d455f14e4b05c79be7097d",
+  "manuscript_pdf_filename": "MDPI_Edge_agents_for_DUDU_BLDC (1)(1).pdf",
+  "manuscript_pdf_sha256": "c05df6d1a63b1d459b8310cea7fbf456a510926544234a0b92231176df404022",
+  "manuscript_version": "July 15, 2026 manuscript version",
+  "extraction_policy": "Whitelist of ArticleV1 code/config/figure-generation dependencies; excludes generated Output, raw data, trained models and large results.",
+  "publication_specific_extensions": [
+    "scripts/01_prepare_windows.py generates canonical provenance directly from pinned raw CSVs, removing a private historical V2 metadata dependency.",
+    "trustworthy_agent.article_v1.publication_e2 provides a transparent fallback to a compact routing snapshot when the historical posterior_trace.nc is absent.",
+    "scripts/00-06 and scripts/reproduce_all.py provide a clean numbered public interface."
+  ]
+}

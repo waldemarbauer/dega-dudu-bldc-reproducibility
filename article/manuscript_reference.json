@@ -1,0 +1,21 @@
+{
+  "title": "DEGA: A Deterministic Diagnostic Evidence Governance Agent for Industrial IoT—A DUDU-BLDC Case Study",
+  "manuscript_version": "July 15, 2026 manuscript version",
+  "journal": "Information",
+  "status": "submitted manuscript version supplied by the repository author",
+  "source_pdf_filename": "MDPI_Edge_agents_for_DUDU_BLDC (1)(1).pdf",
+  "source_pdf_sha256": "c05df6d1a63b1d459b8310cea7fbf456a510926544234a0b92231176df404022",
+  "source_pdf_included_in_repository": false,
+  "authors": [
+    "Waldemar Bauer",
+    "Kacper Jarzyna",
+    "Agnieszka Piątek",
+    "Miłosz Ziemba",
+    "Jerzy Baranowski"
+  ],
+  "dataset": {
+    "name": "DUDU-BLDC",
+    "zenodo_record_id": "15522163",
+    "doi": "10.5281/zenodo.15522163"
+  }
+}

@@ -1,0 +1,257 @@
+schema_version: "1.0"
+mapping_id: DUDU_BLDC_TRUSTWORTHY_AGENT_ARTICLE_STATE_MAPPING
+mapping_version: "1.1.0"
+source_profile:
+  profile_id: diagnostic_full_v1
+  profile_version: "1.0.0"
+authority:
+  semantic_states_are_authoritative: true
+  canonical_technical_view_is_one_to_one: true
+  simplified_article_view_is_presentation_only: true
+  runtime_import_forbidden: true
+  transition_probability_semantics: workflow_control_probability
+  physical_degradation_probability_claim: false
+
+views:
+  canonical_technical:
+    title: Canonical Technical State Model
+    presentation_only: false
+    mapping_semantics: one_to_one_with_semantic_fsm
+    nodes:
+      - {display_state: S0, display_label: Data Acquisition, semantic_states: [DATA_ACQUISITION], node_kind: execution_state}
+      - {display_state: S1, display_label: Data Validation, semantic_states: [DATA_VALIDATION], node_kind: execution_state}
+      - {display_state: S2, display_label: Feature Extraction, semantic_states: [FEATURE_EXTRACTION], node_kind: execution_state}
+      - {display_state: S3, display_label: Spline Modelling, semantic_states: [SPLINE_MODELLING], node_kind: execution_state}
+      - {display_state: S4, display_label: Diagnostic Inference, semantic_states: [DIAGNOSTIC_INFERENCE], node_kind: execution_state}
+      - {display_state: S5, display_label: Explanation Generation, semantic_states: [EXPLANATION_GENERATION], node_kind: execution_state}
+      - {display_state: S6, display_label: Decision Check, semantic_states: [DECISION_CHECK], node_kind: execution_state}
+      - {display_state: S7, display_label: Recommendation, semantic_states: [RECOMMENDATION], node_kind: execution_state}
+      - {display_state: S8, display_label: Escalation, semantic_states: [ESCALATION], node_kind: execution_state}
+      - {display_state: S9, display_label: No Decision, semantic_states: [NO_DECISION], node_kind: execution_state}
+      - {display_state: S10, display_label: Audit, semantic_states: [AUDIT], node_kind: execution_state}
+      - {display_state: END, display_label: End, semantic_states: [], node_kind: terminator}
+    additional_edges:
+      - {source: S10, target: END, edge_kind: presentation_completion}
+
+  simplified_article:
+    title: Simplified Introductory Workflow
+    presentation_only: true
+    mapping_semantics: grouped_non_normative_introduction
+    nodes:
+      - {display_state: S0, display_label: Data Acquisition, semantic_states: [DATA_ACQUISITION], node_kind: execution_state}
+      - {display_state: S1, display_label: Data Validation, semantic_states: [DATA_VALIDATION], node_kind: execution_state}
+      - {display_state: S2, display_label: Feature Extraction, semantic_states: [FEATURE_EXTRACTION], node_kind: execution_state}
+      - {display_state: S3, display_label: Spline Modelling, semantic_states: [SPLINE_MODELLING], node_kind: execution_state}
+      - {display_state: S4, display_label: Diagnostic Inference, semantic_states: [DIAGNOSTIC_INFERENCE], node_kind: execution_state}
+      - {display_state: S5, display_label: Explanation Generation, semantic_states: [EXPLANATION_GENERATION], node_kind: execution_state}
+      - {display_state: S6, display_label: Decision Check, semantic_states: [DECISION_CHECK], node_kind: execution_state}
+      - {display_state: S7, display_label: Recommendation, semantic_states: [RECOMMENDATION], node_kind: execution_state}
+      - {display_state: S8, display_label: Safe Alternative (presentation-only), semantic_states: [ESCALATION, NO_DECISION], node_kind: presentation_group}
+      - {display_state: AUDIT, display_label: Audit, semantic_states: [AUDIT], node_kind: execution_state}
+      - {display_state: END, display_label: End, semantic_states: [], node_kind: terminator}
+    additional_edges:
+      - {source: AUDIT, target: END, edge_kind: presentation_completion}
+
+states:
+  - semantic_state: DATA_ACQUISITION
+    canonical_state: S0
+    simplified_state: S0
+    article_label: Data Acquisition
+    purpose: Load or acquire one diagnostic case and its provenance.
+    inputs: [dataset identity, acquisition request or case identifier]
+    outputs: [input identifiers, source provenance, input availability]
+    allowed_transitions: [DATA_VALIDATION]
+    implementation_class: trustworthy_agent.agent.engine:AgentEngine
+    strategy_interface: trustworthy_agent.strategies.base:StateStrategy
+    default_strategy: runtime_selected
+    available_strategies: [runtime_selected_state_strategy]
+    safety_guard_interaction: The policy proposal is evaluated by SafetyGuard before DATA_VALIDATION is entered.
+    audit_interaction: State execution and the accepted transition are recorded.
+    output_evidence: [AgentContext.input_ids, AgentContext.derived_facts]
+
+  - semantic_state: DATA_VALIDATION
+    canonical_state: S1
+    simplified_state: S1
+    article_label: Data Validation
+    purpose: Assess availability, schema validity, completeness, plausibility, and data quality.
+    inputs: [acquired diagnostic case, schema and quality requirements]
+    outputs: [validation status, data quality, missingness, reason codes]
+    allowed_transitions: [FEATURE_EXTRACTION, DATA_ACQUISITION, NO_DECISION]
+    implementation_class: trustworthy_agent.agent.engine:AgentEngine
+    strategy_interface: trustworthy_agent.strategies.base:StateStrategy
+    default_strategy: runtime_selected
+    available_strategies: [runtime_selected_state_strategy]
+    safety_guard_interaction: Invalid or insufficient data may force reacquisition or NO_DECISION.
+    audit_interaction: Validation facts, reason codes, and the guarded transition are recorded.
+    output_evidence: [validation_passed, data_quality, missing_ratio, reason_codes]
+
+  - semantic_state: FEATURE_EXTRACTION
+    canonical_state: S2
+    simplified_state: S2
+    article_label: Feature Extraction
+    purpose: Produce the classical and derived feature representation required by downstream strategies.
+    inputs: [validated diagnostic case, resolved feature configuration]
+    outputs: [feature values, feature names, representation identity, feature hash, extraction status]
+    allowed_transitions: [SPLINE_MODELLING, NO_DECISION]
+    implementation_class: trustworthy_agent.agent.engine:AgentEngine
+    strategy_interface: trustworthy_agent.strategies.base:StateStrategy
+    default_strategy: runtime_selected
+    available_strategies: [runtime_selected_state_strategy]
+    safety_guard_interaction: Unusable or invalid features may force NO_DECISION.
+    audit_interaction: Feature identity, provenance, status, and the guarded transition are recorded.
+    output_evidence: [feature_representation, feature_names, feature_hash, extraction_status]
+
+  - semantic_state: SPLINE_MODELLING
+    canonical_state: S3
+    simplified_state: S3
+    article_label: Spline Modelling
+    purpose: Model ordered diagnostic indicators and return spline-derived evidence without inventing degradation-time semantics.
+    inputs: [validated feature series, ordering provenance, training-only Healthy reference]
+    outputs: [smoothed value, derivatives, curvature, Healthy distance, fit quality, fit status]
+    allowed_transitions: [DIAGNOSTIC_INFERENCE, ESCALATION, NO_DECISION]
+    implementation_class: trustworthy_agent.strategies.spline.smoothing_spline:SmoothingSplineStrategy
+    strategy_interface: trustworthy_agent.strategies.base:StateStrategy
+    default_strategy: smoothing_spline
+    available_strategies: [smoothing_spline, identity_no_spline]
+    safety_guard_interaction: Fit failure, conflict, or insufficient support may force ESCALATION or NO_DECISION.
+    audit_interaction: Strategy identity, parameters, ordering/reference hashes, fit status, and transition are recorded.
+    output_evidence: [smoothed_value, slope, second_derivative, curvature, distance_from_healthy, fit_status]
+
+  - semantic_state: DIAGNOSTIC_INFERENCE
+    canonical_state: S4
+    simplified_state: S4
+    article_label: Diagnostic Inference
+    purpose: Predict a canonical diagnostic class and class probabilities from the selected representation.
+    inputs: [feature representation, persisted model, canonical class order]
+    outputs: [predicted class, class probabilities, confidence, model identity, representation identity]
+    allowed_transitions: [EXPLANATION_GENERATION, ESCALATION]
+    implementation_class: trustworthy_agent.strategies.diagnosis.random_forest:RandomForestDiagnosticStrategy
+    strategy_interface: trustworthy_agent.strategies.base:StateStrategy
+    default_strategy: random_forest
+    available_strategies: [random_forest, logistic_regression]
+    safety_guard_interaction: Unsupported diagnostic evidence or high-risk conditions may force ESCALATION.
+    audit_interaction: Model, feature, split, seed, probabilities, confidence, and transition evidence are recorded.
+    output_evidence: [predicted_class, class_probabilities, confidence, model_hash, feature_representation]
+
+  - semantic_state: EXPLANATION_GENERATION
+    canonical_state: S5
+    simplified_state: S5
+    article_label: Explanation Generation
+    purpose: Produce explicit local, global, and domain explanation evidence with visible partial failures.
+    inputs: [diagnostic output, model and feature identities, explanation references]
+    outputs: [availability, explanation text, top features, contributions, explanation score, method identity]
+    allowed_transitions: [DECISION_CHECK, ESCALATION, NO_DECISION]
+    implementation_class: trustworthy_agent.strategies.explanation.composite:CompositeExplanationStrategy
+    strategy_interface: trustworthy_agent.strategies.base:StateStrategy
+    default_strategy: composite_explanation
+    available_strategies: [composite_explanation, permutation_importance, shap_local, domain_rules]
+    safety_guard_interaction: Missing mandatory explanation may force ESCALATION or NO_DECISION.
+    audit_interaction: Component versions, availability, failure codes, references, score definition, and transition are recorded.
+    output_evidence: [explanation_available, top_features, feature_contributions, explanation_score, method]
+
+  - semantic_state: DECISION_CHECK
+    canonical_state: S6
+    simplified_state: S6
+    article_label: Decision Check
+    purpose: Decide whether evidence supports recommendation, escalation, rejection, or acquisition of new data.
+    inputs: [confidence, data quality, missingness, explanation score, agreement, risk, OOD, conflict]
+    outputs: [admissibility flags, reason codes, evaluated thresholds, conflicts, risk tier]
+    allowed_transitions: [RECOMMENDATION, ESCALATION, NO_DECISION]
+    implementation_class: trustworthy_agent.strategies.decision.threshold:ThresholdDecisionCheckStrategy
+    strategy_interface: trustworthy_agent.strategies.base:StateStrategy
+    default_strategy: threshold_decision_check
+    available_strategies: [threshold_decision_check, weighted_score]
+    safety_guard_interaction: SafetyGuard remains authoritative and may override recommendation eligibility.
+    audit_interaction: Threshold values/status, evaluated conditions, reason codes, and guarded transition are recorded.
+    output_evidence: [can_recommend, must_escalate, must_reject, request_new_data, reason_codes, thresholds_evaluated]
+
+  - semantic_state: RECOMMENDATION
+    canonical_state: S7
+    simplified_state: S7
+    article_label: Recommendation
+    purpose: Emit a controlled-vocabulary recommendation only when required evidence is admissible.
+    inputs: [supported diagnosis, confidence, risk tier, reason codes, SafetyGuard approval]
+    outputs: [action code, human-readable text, supporting diagnosis, required follow-up, strategy identity]
+    allowed_transitions: [AUDIT]
+    implementation_class: trustworthy_agent.strategies.recommendation.conservative:ConservativeRuleRecommendationStrategy
+    strategy_interface: trustworthy_agent.strategies.base:StateStrategy
+    default_strategy: conservative_rule_recommendation
+    available_strategies: [conservative_rule_recommendation, risk_tiered]
+    safety_guard_interaction: The strategy cannot bypass SafetyGuard or emit unsupported high-risk actions.
+    audit_interaction: Action vocabulary, mapping version, evidence snapshot, approval, and transition to AUDIT are recorded.
+    output_evidence: [action_code, supporting_diagnosis, confidence, risk_tier, reason_codes, required_follow_up]
+
+  - semantic_state: ESCALATION
+    canonical_state: S8
+    simplified_state: S8
+    article_label: Escalation
+    purpose: Route an unsupported, conflicting, high-risk, OOD, or policy-uncertain case to expert review.
+    inputs: [guarded decision, triggering rule identifiers, evidence snapshot]
+    outputs: [escalation outcome, expert-review requirement, reason codes]
+    allowed_transitions: [AUDIT]
+    implementation_class: trustworthy_agent.agent.engine:AgentEngine
+    strategy_interface: trustworthy_agent.strategies.base:StateStrategy
+    default_strategy: runtime_selected
+    available_strategies: [runtime_selected_state_strategy]
+    safety_guard_interaction: SafetyGuard may force this state regardless of the policy's preferred proposal.
+    audit_interaction: The escalation reason and transition to AUDIT are mandatory audit evidence.
+    output_evidence: [safety_override, triggered_rule_ids, decision_reason, final_state]
+
+  - semantic_state: NO_DECISION
+    canonical_state: S9
+    simplified_state: S8
+    article_label: No Decision
+    purpose: Reject unsupported automation or request new data without issuing a normal recommendation.
+    inputs: [guarded decision, data/audit/explanation failure evidence, reason codes]
+    outputs: [no-decision outcome, request-new-data flag or action, reason codes]
+    allowed_transitions: [AUDIT]
+    implementation_class: trustworthy_agent.agent.engine:AgentEngine
+    strategy_interface: trustworthy_agent.strategies.base:StateStrategy
+    default_strategy: runtime_selected
+    available_strategies: [runtime_selected_state_strategy]
+    safety_guard_interaction: SafetyGuard may force this state for poor data, invalid evidence, or fail-closed conditions.
+    audit_interaction: The rejection/fail-closed reason and transition to AUDIT are mandatory audit evidence.
+    output_evidence: [safety_override, triggered_rule_ids, decision_reason, final_state]
+
+  - semantic_state: AUDIT
+    canonical_state: S10
+    simplified_state: AUDIT
+    article_label: Audit
+    purpose: Finalize the terminal context and persist complete tamper-evident decision evidence.
+    inputs: [complete AgentContext, state path, state results, transitions, provenance hashes]
+    outputs: [finalized audit record, audit hash-chain endpoint, terminal context or fail-closed context]
+    allowed_transitions: []
+    implementation_class: trustworthy_agent.audit.logger:AuditRecorder
+    strategy_interface: trustworthy_agent.audit.logger:AuditRecorder.finalize_outcome
+    default_strategy: audit_finalization_contract
+    available_strategies: [audit_finalization_contract]
+    safety_guard_interaction: No policy transition is evaluated; an audit write failure returns a fail-closed context.
+    audit_interaction: This state is the mandatory atomic finalization boundary.
+    output_evidence: [audit_event_hash, previous_event_hash, state_path, final_action, decision_reason]
+
+transition_policies:
+  - policy: StaticTransitionMatrixPolicy
+    implementation_class: trustworthy_agent.transitions.static_markov:StaticTransitionMatrixPolicy
+    consumed_evidence: [current semantic state, allowed transitions, fixed configured workflow probabilities]
+    produced_decision: Normalized TransitionDecision with selected semantic state and policy identity.
+    safety_interaction: Proposal is always evaluated by external SafetyGuard.
+  - policy: FeatureDependentMarkovPolicy
+    implementation_class: trustworthy_agent.transitions.feature_markov:FeatureDependentMarkovPolicy
+    consumed_evidence: [confidence, data quality, missingness, explanation score, risk, OOD, conflict]
+    produced_decision: Feature-modified workflow probabilities and selected semantic state.
+    safety_interaction: Context modifiers do not replace or bypass SafetyGuard.
+  - policy: DeterministicPosteriorApproximationPolicy
+    implementation_class: trustworthy_agent.transitions.bayesian:DeterministicPosteriorApproximationPolicy
+    consumed_evidence: [current semantic state, allowed transitions, feature-conditioned deterministic posterior approximation]
+    produced_decision: Deterministic approximate posterior workflow decision; not MCMC.
+    safety_interaction: Proposal is always evaluated by external SafetyGuard.
+  - policy: BayesianMCMCTransitionPolicy
+    implementation_class: trustworthy_agent.transitions.bayesian:BayesianMCMCTransitionPolicy
+    consumed_evidence: [current semantic state, allowed transitions, persisted posterior samples and diagnostics]
+    produced_decision: Posterior-informed workflow probabilities and selected semantic state.
+    safety_interaction: Proposal is always evaluated by external SafetyGuard.
+  - policy: HybridTransitionPolicy
+    implementation_class: trustworthy_agent.transitions.bayesian:HybridTransitionPolicy
+    consumed_evidence: [static probabilities, posterior-informed probabilities, posterior diagnostics]
+    produced_decision: Combined workflow decision with conservative fallback when posterior evidence is invalid.
+    safety_interaction: Hybrid composition remains subordinate to external SafetyGuard.

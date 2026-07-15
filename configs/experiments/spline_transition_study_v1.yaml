@@ -1,0 +1,118 @@
+schema_version: "1.0"
+config_type: experiment_protocol
+experiment_id: SPLINE_TRANSITION_STUDY_V1
+protocol_version: "1.0.0"
+status: frozen_split_protocol
+
+dataset:
+  dataset_id: DUDU-BLDC
+  dataset_version: v1
+  record_id: "15522163"
+  doi: 10.5281/zenodo.15522163
+
+split:
+  split_id: spline_transition_study_v1
+  seed: 20260712
+  algorithm: deterministic_group_aware_holdout
+  required_grouping_fields:
+    - Experiment ID
+  fallback_without_verified_groups: fail_closed
+  train_fraction: 0.60
+  validation_fraction: 0.20
+  test_fraction: 0.20
+  persist_train_groups: true
+  persist_validation_groups: true
+  persist_test_groups: true
+  persist_row_identifiers: true
+  persist_class_distributions: true
+  persist_dataset_hash: true
+  persist_split_hash: true
+
+leakage_policy:
+  fit_learned_operations_on: train_only
+  validation_use: selection_or_diagnostics_only
+  test_use: final_evaluation_only
+  forbid_test_fit: true
+  forbid_test_driven_selection: true
+  classifier_training_enabled_in_this_task: false
+
+planned_comparison:
+  spline_representations:
+    - V0_classical
+    - V1_smoothing_spline_derivatives
+    - V2_b_spline_coefficients
+    - V3_p_spline
+    - V4_healthy_relative_spline
+    - V5_fit_selected
+    - V5_diagnostic_selected
+  classifiers:
+    - name: logistic_regression
+      status: implemented_baseline
+    - name: random_forest
+      status: implemented_baseline
+    - name: xgboost
+      status: required_future_implementation
+      training_enabled_in_this_task: false
+  transition_policies:
+    - static_markov
+    - bayesian_mcmc_to_be_implemented
+    - safety_gated_hybrid
+
+representations:
+  ordered_axis_semantics: ordered_feature_index
+  forbid_degradation_time_claim: true
+  V0_classical:
+    source: validated_classical_features
+  V1_smoothing_spline_derivatives:
+    degree: 3
+    smoothing: auto_training_fixed
+  V2_b_spline_coefficients:
+    degree: 3
+    interior_knot_count: 4
+    knot_strategy: training_axis_quantiles
+  V3_p_spline:
+    degree: 3
+    interior_knot_count: 4
+    knot_strategy: training_axis_quantiles
+    penalty_lambda: 10.0
+    difference_order: 2
+  V4_healthy_relative_spline:
+    healthy_reference_fit_scope: training_only
+    distance_threshold_sigma: 3.0
+    threshold_source: experimental_default
+  V5_fit_selected:
+    classical_source: V0_classical
+    candidate_spline_representations:
+      - V1_smoothing_spline_derivatives
+      - V2_b_spline_coefficients
+      - V3_p_spline
+    selection_split: validation
+    selection_metric: validation_reconstruction_rmse
+    selection_direction: minimize
+    diagnostic_superiority_claim: none
+    article_facing_role: fit_quality_diagnostic_only
+  V5_diagnostic_selected:
+    status: pending_classifier_evaluation
+    classical_source: V0_classical
+    candidate_spline_representations:
+      - V1_smoothing_spline_derivatives
+      - V2_b_spline_coefficients
+      - V3_p_spline
+      - V4_healthy_relative_spline
+    selection_split: validation
+    primary_metric: validation_macro_f1
+    secondary_metric: validation_balanced_accuracy
+    tie_breakers:
+      - lower_fit_failure_rate
+      - better_calibration
+      - lower_feature_complexity
+      - higher_feature_stability
+    requires_validation_classifier_results: true
+    test_set_use_for_selection: forbidden
+    classifier_training_enabled_in_this_task: false
+
+outputs:
+  split_json: Data/AnalysisData/Splits/spline_transition_study_v1.json
+  split_manifest: Output/Manifests/spline_transition_study_v1_split_manifest.json
+  representation_features: Data/AnalysisData/SplineRepresentations/spline_transition_study_v1_features.csv
+  representation_manifest: Output/Manifests/spline_transition_study_v1_representation_manifest.json

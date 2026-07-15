@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0.0",
+  "scope": "publication-repository extraction validation without external dataset execution",
+  "checks": {
+    "python_compileall": "PASS",
+    "repository_contract_pytest": {
+      "status": "PASS",
+      "passed": 5
+    },
+    "internal_import_closure": {
+      "status": "PASS",
+      "missing": 0
+    },
+    "referenced_config_literals": {
+      "status": "PASS",
+      "missing": 0
+    },
+    "structured_json_toml_yaml_parse": "PASS",
+    "machine_local_absolute_path_scan": {
+      "status": "PASS",
+      "hits": 0
+    },
+    "generated_scientific_artifact_exclusion": {
+      "status": "PASS",
+      "forbidden_artifacts_found": 0
+    },
+    "ruff": "NOT_RUN_TOOL_UNAVAILABLE_IN_EXTRACTION_RUNTIME",
+    "mypy": "NOT_RUN_PROJECT_ENVIRONMENT_NOT_INSTALLED",
+    "full_scientific_reproduction": "NOT_RUN_EXTERNAL_DATASET_AND_COMPATIBLE_PYTHON_ENVIRONMENT_REQUIRED",
+    "uv_lock_fresh_resolution": "NOT_RUN_EXTRACTION_RUNTIME_ONLY_HAD_PYTHON_3_13_WHILE_PROJECT_REQUIRES_3_11_OR_3_12"
+  },
+  "release_blockers": [
+    "Choose and insert the intended public software license.",
+    "Run full clean-clone reproduction under Python 3.11 or 3.12 with the pinned DUDU-BLDC dataset.",
+    "Confirm final figure outputs against manuscript production artifacts."
+  ]
+}

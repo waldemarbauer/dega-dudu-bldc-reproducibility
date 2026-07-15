@@ -1,0 +1,59 @@
+[project]
+name = "trustworthy-agent"
+version = "0.1.0"
+description = "Reproduction code for the DEGA DUDU-BLDC case study."
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "matplotlib>=3.9,<4",
+    "numpy>=2.4.6",
+    "pandas>=2.2,<3",
+    "pyarrow>=17,<23",
+    "pyyaml>=6.0.3",
+    "scikit-learn>=1.9.0",
+    "scipy>=1.17.1",
+]
+
+[build-system]
+requires = ["hatchling>=1.25,<2"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.11,<2",
+    "pytest>=8.2,<9",
+    "ruff>=0.6,<1",
+]
+# Optional: required only to rerun the historical PyMC/NUTS transition-policy
+# fit when the original pre-ArticleV1 training artifacts are supplied.
+mcmc = [
+    "arviz==0.22.0",
+    "h5netcdf==1.6.3",
+    "pymc==5.26.1",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/trustworthy_agent"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+    "full_data: requires the external DUDU-BLDC dataset",
+    "article_v1: ArticleV1 scientific protocol",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+force-exclude = true
+extend-exclude = ["Data/InputData/External/**", "Output/**", "figures_m3/output/**"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+mypy_path = "src"
+files = ["src", "tests", "scripts", "Scripts"]

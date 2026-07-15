@@ -1,0 +1,153 @@
+# Technical rendering and export defaults for scientific figures.
+#
+# These profiles define dimensions, formats, DPI, layout strategy, and the
+# corresponding Matplotlib style asset. They do not select analytical content,
+# axis transformations, or semantic colour mappings.
+#
+# Dimensions are initial defaults. Publisher- or template-specific dimensions
+# should be declared as explicit project overrides and approved before use.
+
+schema_version: 1
+
+defaults:
+  background: light
+  transparent: false
+  final_overwrite: false
+  pad_inches: 0.05
+
+profiles:
+  publication-single-column:
+    profile: publication
+    style_asset: publication-single-column.mplstyle
+    layout_class: single-column
+    layout_strategy: constrained
+    dimensions:
+      width_in: 3.5
+      height_in: 2.6
+    formats:
+      - pdf
+      - png
+    png:
+      dpi: 300
+    pdf:
+      fonttype: 42
+      transparent: false
+      rasterized_artist_dpi: 300
+    exact_physical_size_required: true
+
+  publication-double-column:
+    profile: publication
+    style_asset: publication-double-column.mplstyle
+    layout_class: double-column
+    layout_strategy: constrained
+    dimensions:
+      width_in: 7.0
+      height_in: 4.2
+    formats:
+      - pdf
+      - png
+    png:
+      dpi: 300
+    pdf:
+      fonttype: 42
+      transparent: false
+      rasterized_artist_dpi: 300
+    exact_physical_size_required: true
+
+  publication-full-page:
+    profile: publication
+    style_asset: publication-full-page.mplstyle
+    layout_class: full-page
+    layout_strategy: constrained
+    dimensions:
+      width_in: 7.0
+      height_in: 8.5
+    formats:
+      - pdf
+      - png
+    png:
+      dpi: 300
+    pdf:
+      fonttype: 42
+      transparent: false
+      rasterized_artist_dpi: 300
+    exact_physical_size_required: true
+
+  presentation-full-slide-wide:
+    profile: presentation
+    style_asset: presentation-full-slide-wide.mplstyle
+    layout_class: full-slide-wide
+    layout_strategy: constrained
+    slide:
+      aspect_ratio: "16:9"
+      intended_placement: full-slide
+      title_area_reserved: true
+    dimensions:
+      width_in: 11.8
+      height_in: 5.8
+    formats:
+      - pdf
+      - png
+    png:
+      dpi: 200
+    pdf:
+      fonttype: 42
+      transparent: false
+      rasterized_artist_dpi: 200
+    exact_physical_size_required: true
+
+  presentation-side-by-side-square:
+    profile: presentation
+    style_asset: presentation-side-by-side-square.mplstyle
+    layout_class: side-by-side-square
+    layout_strategy: constrained
+    slide:
+      aspect_ratio: "16:9"
+      intended_placement: half-slide
+      title_area_reserved: true
+    dimensions:
+      width_in: 5.2
+      height_in: 5.2
+    formats:
+      - pdf
+      - png
+    png:
+      dpi: 200
+    pdf:
+      fonttype: 42
+      transparent: false
+      rasterized_artist_dpi: 200
+    exact_physical_size_required: true
+
+  exploratory:
+    profile: exploratory
+    style_asset: exploratory.mplstyle
+    layout_class: exploratory-default
+    layout_strategy: constrained
+    dimensions:
+      width_in: 7.0
+      height_in: 4.5
+    formats:
+      - png
+    png:
+      dpi: 150
+    exact_physical_size_required: false
+
+  diagnostic:
+    profile: diagnostic
+    style_asset: diagnostic.mplstyle
+    layout_class: diagnostic-default
+    layout_strategy: constrained
+    dimensions:
+      width_in: 8.0
+      height_in: 6.0
+    formats:
+      - pdf
+      - png
+    png:
+      dpi: 200
+    pdf:
+      fonttype: 42
+      transparent: false
+      rasterized_artist_dpi: 200
+    exact_physical_size_required: true

@@ -1,0 +1,1201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:scientific-figures:figures-schema:1",
+  "title": "Scientific figures project configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "figures"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "project": {
+      "$ref": "#/$defs/project"
+    },
+    "defaults": {
+      "$ref": "#/$defs/defaults"
+    },
+    "figures": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/identifier"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/figure"
+      }
+    },
+    "packages": {
+      "type": "object",
+      "propertyNames": {
+        "$ref": "#/$defs/identifier"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/package"
+      }
+    }
+  },
+  "$defs": {
+    "identifier": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z]:[\\\\/]).+"
+    },
+    "decision": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "user-approved",
+        "not-applicable"
+      ]
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "root_relative_paths": {
+          "type": "boolean"
+        },
+        "paths": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "draft": {
+              "$ref": "#/$defs/path"
+            },
+            "final": {
+              "$ref": "#/$defs/path"
+            },
+            "captions": {
+              "$ref": "#/$defs/path"
+            },
+            "validation": {
+              "$ref": "#/$defs/path"
+            },
+            "legacy_baseline": {
+              "$ref": "#/$defs/path"
+            },
+            "packages": {
+              "$ref": "#/$defs/path"
+            }
+          }
+        }
+      }
+    },
+    "defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "palette": {
+          "$ref": "#/$defs/symbolicName"
+        },
+        "neutral_palette": {
+          "$ref": "#/$defs/symbolicName"
+        },
+        "outputs": {
+          "$ref": "#/$defs/defaultOutputs"
+        },
+        "accessibility": {
+          "$ref": "#/$defs/accessibility"
+        }
+      }
+    },
+    "defaultOutputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "formats": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "pdf",
+              "png",
+              "eps",
+              "svg",
+              "tiff",
+              "jpeg"
+            ]
+          }
+        },
+        "png": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "draft_dpi": {
+              "type": "integer",
+              "minimum": 72
+            },
+            "final_dpi": {
+              "type": "integer",
+              "minimum": 72
+            }
+          }
+        },
+        "overwrite": {
+          "$ref": "#/$defs/overwrite"
+        }
+      }
+    },
+    "figure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "specification",
+        "implementation"
+      ],
+      "properties": {
+        "specification": {
+          "$ref": "#/$defs/specification"
+        },
+        "implementation": {
+          "$ref": "#/$defs/implementation"
+        }
+      }
+    },
+    "specification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profile",
+        "intent",
+        "analytical_source",
+        "content",
+        "layout",
+        "outputs",
+        "approvals"
+      ],
+      "properties": {
+        "profile": {
+          "enum": [
+            "exploratory",
+            "diagnostic",
+            "publication",
+            "presentation"
+          ]
+        },
+        "intent": {
+          "$ref": "#/$defs/intent"
+        },
+        "analytical_source": {
+          "$ref": "#/$defs/analyticalSource"
+        },
+        "content": {
+          "$ref": "#/$defs/content"
+        },
+        "layout": {
+          "$ref": "#/$defs/layout"
+        },
+        "visual": {
+          "$ref": "#/$defs/visual"
+        },
+        "captions": {
+          "$ref": "#/$defs/captions"
+        },
+        "outputs": {
+          "$ref": "#/$defs/outputs"
+        },
+        "accessibility": {
+          "$ref": "#/$defs/accessibility"
+        },
+        "approvals": {
+          "$ref": "#/$defs/approvals"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "profile": {
+                "const": "presentation"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "layout": {
+                "properties": {
+                  "class": {
+                    "enum": [
+                      "full-slide-wide",
+                      "side-by-side-square",
+                      "custom"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "profile": {
+                "const": "publication"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "captions",
+              "accessibility"
+            ]
+          }
+        }
+      ]
+    },
+    "intent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "purpose"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "resolved",
+            "unresolved"
+          ]
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "diagnostic_question": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_reference_behavior": {
+          "type": "string",
+          "minLength": 1
+        },
+        "message_status": {
+          "enum": [
+            "confirmed",
+            "provisional",
+            "diagnostic",
+            "user-defined",
+            "unresolved"
+          ]
+        },
+        "audience": {
+          "type": "string",
+          "minLength": 1
+        },
+        "medium": {
+          "type": "string",
+          "minLength": 1
+        },
+        "manuscript_role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "placement": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "analyticalSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "resolved",
+            "unresolved"
+          ]
+        },
+        "artifact": {
+          "$ref": "#/$defs/path"
+        },
+        "description": {
+          "type": "string"
+        },
+        "producer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "file",
+            "function"
+          ],
+          "properties": {
+            "file": {
+              "$ref": "#/$defs/path"
+            },
+            "function": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "resolved"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "artifact"
+            ]
+          }
+        }
+      ]
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "resolved",
+            "unresolved"
+          ]
+        },
+        "series": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "primary_series": {
+          "$ref": "#/$defs/identifier"
+        },
+        "contextual_series": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "panels": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/identifier"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/panel"
+          }
+        },
+        "selection_status": {
+          "enum": [
+            "pending",
+            "user-approved",
+            "not-applicable"
+          ]
+        }
+      }
+    },
+    "panel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "quantity"
+      ],
+      "properties": {
+        "role": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quantity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "class",
+        "strategy"
+      ],
+      "properties": {
+        "class": {
+          "type": "string",
+          "minLength": 1
+        },
+        "width_in": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height_in": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "strategy": {
+          "enum": [
+            "constrained",
+            "tight",
+            "manual",
+            "profile-defined"
+          ]
+        },
+        "reading_order": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "axes": {
+          "$ref": "#/$defs/axes"
+        },
+        "slide": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "aspect_ratio": {
+              "type": "string",
+              "minLength": 1
+            },
+            "placement": {
+              "type": "string",
+              "minLength": 1
+            },
+            "title_area_reserved": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "class": {
+                "const": "custom"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "width_in",
+              "height_in"
+            ]
+          }
+        }
+      ]
+    },
+    "axes": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/axisDefinition"
+      }
+    },
+    "axisDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "scale": {
+          "enum": [
+            "linear",
+            "log",
+            "symlog"
+          ]
+        },
+        "displayed_range": {
+          "enum": [
+            "full",
+            "custom"
+          ]
+        },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "lower",
+            "upper"
+          ],
+          "properties": {
+            "lower": {
+              "type": "number"
+            },
+            "upper": {
+              "type": "number"
+            }
+          }
+        },
+        "shared_scales": {
+          "type": "boolean"
+        },
+        "approval": {
+          "$ref": "#/$defs/decision"
+        }
+      }
+    },
+    "visual": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "palette": {
+          "$ref": "#/$defs/symbolicName"
+        },
+        "title": {
+          "$ref": "#/$defs/strategy"
+        },
+        "labels": {
+          "$ref": "#/$defs/strategy"
+        },
+        "legend": {
+          "$ref": "#/$defs/strategy"
+        },
+        "grid": {
+          "$ref": "#/$defs/strategy"
+        },
+        "mappings": {
+          "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/identifier"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/visualMapping"
+          }
+        },
+        "reference_lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/referenceLine"
+          }
+        },
+        "annotations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/annotation"
+          }
+        }
+      }
+    },
+    "strategy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "strategy"
+      ],
+      "properties": {
+        "strategy": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "visualMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "color_role": {
+          "$ref": "#/$defs/symbolicName"
+        },
+        "line_style": {
+          "type": "string",
+          "minLength": 1
+        },
+        "marker": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "referenceLine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "meaning",
+        "source",
+        "style_role"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "meaning": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "style_role": {
+          "$ref": "#/$defs/symbolicName"
+        }
+      }
+    },
+    "annotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "text",
+        "target",
+        "source"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/identifier"
+        },
+        "type": {
+          "enum": [
+            "descriptive",
+            "interpretive"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approval": {
+          "$ref": "#/$defs/decision"
+        }
+      }
+    },
+    "captions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "markdown",
+        "latex",
+        "status"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "markdown": {
+          "type": "boolean"
+        },
+        "latex": {
+          "type": "boolean"
+        },
+        "latex_mode": {
+          "enum": [
+            "caption-only",
+            "complete-environment",
+            "disabled"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "pattern": "^fig:[A-Za-z0-9][A-Za-z0-9:._-]*$"
+        },
+        "status": {
+          "enum": [
+            "not-started",
+            "draft",
+            "requires-information",
+            "verified",
+            "user-reviewed",
+            "final"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "latex": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "latex_mode",
+              "label"
+            ]
+          }
+        }
+      ]
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "paths",
+        "overwrite"
+      ],
+      "properties": {
+        "export_profile": {
+          "$ref": "#/$defs/identifier"
+        },
+        "formats": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "pdf",
+              "png",
+              "eps",
+              "svg",
+              "tiff",
+              "jpeg"
+            ]
+          }
+        },
+        "png": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "dpi"
+          ],
+          "properties": {
+            "dpi": {
+              "type": "integer",
+              "minimum": 72
+            }
+          }
+        },
+        "paths": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "draft_stem",
+            "final_stem"
+          ],
+          "properties": {
+            "draft_stem": {
+              "$ref": "#/$defs/path"
+            },
+            "final_stem": {
+              "$ref": "#/$defs/path"
+            }
+          }
+        },
+        "overwrite": {
+          "$ref": "#/$defs/overwrite"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "export_profile"
+          ]
+        },
+        {
+          "required": [
+            "formats"
+          ]
+        }
+      ]
+    },
+    "overwrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "draft",
+        "final"
+      ],
+      "properties": {
+        "draft": {
+          "type": "boolean"
+        },
+        "final": {
+          "type": "boolean"
+        }
+      }
+    },
+    "accessibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "grayscale": {
+          "enum": [
+            "required",
+            "optional",
+            "not-applicable"
+          ]
+        },
+        "color_vision": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "deuteranopia-or-deuteranomaly",
+              "protanopia-or-protanomaly",
+              "tritanopia-or-tritanomaly"
+            ]
+          }
+        },
+        "color_only_encoding": {
+          "enum": [
+            "forbidden",
+            "discouraged",
+            "allowed"
+          ]
+        },
+        "exception": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "none",
+                "pending",
+                "user-approved"
+              ]
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            },
+            "compensating_mechanism": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "user-approved"
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "reason",
+                  "compensating_mechanism"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "approvals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "content_selection",
+        "interpretation_sensitive_scales",
+        "custom_dimensions",
+        "interpretive_annotations",
+        "accessibility_exception",
+        "final_render"
+      ],
+      "properties": {
+        "content_selection": {
+          "$ref": "#/$defs/decision"
+        },
+        "interpretation_sensitive_scales": {
+          "$ref": "#/$defs/decision"
+        },
+        "custom_dimensions": {
+          "$ref": "#/$defs/decision"
+        },
+        "interpretive_annotations": {
+          "$ref": "#/$defs/decision"
+        },
+        "accessibility_exception": {
+          "$ref": "#/$defs/decision"
+        },
+        "final_render": {
+          "$ref": "#/$defs/decision"
+        }
+      }
+    },
+    "implementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "planned",
+            "legacy",
+            "inventoried",
+            "configured",
+            "structurally-migrated",
+            "implemented",
+            "draft-rendered",
+            "technically-validated",
+            "user-reviewed",
+            "final"
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "registry_key": {
+          "$ref": "#/$defs/identifier"
+        },
+        "artifacts": {
+          "$ref": "#/$defs/artifacts"
+        },
+        "legacy": {
+          "$ref": "#/$defs/legacy"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file"
+      ],
+      "properties": {
+        "file": {
+          "$ref": "#/$defs/path"
+        },
+        "builder": {
+          "type": "string",
+          "minLength": 1
+        },
+        "renderer": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pdf": {
+          "$ref": "#/$defs/path"
+        },
+        "png": {
+          "$ref": "#/$defs/path"
+        },
+        "caption_markdown": {
+          "$ref": "#/$defs/path"
+        },
+        "caption_latex": {
+          "$ref": "#/$defs/path"
+        },
+        "validation": {
+          "$ref": "#/$defs/path"
+        }
+      }
+    },
+    "legacy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "baseline_artifact": {
+          "$ref": "#/$defs/path"
+        },
+        "reproducibility": {
+          "enum": [
+            "yes",
+            "no",
+            "partial",
+            "unresolved"
+          ]
+        },
+        "manual_postprocessing": {
+          "enum": [
+            "none",
+            "documented",
+            "unresolved"
+          ]
+        },
+        "detected_operations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "operation",
+              "location",
+              "classification"
+            ],
+            "properties": {
+              "operation": {
+                "type": "string",
+                "minLength": 1
+              },
+              "location": {
+                "type": "string",
+                "minLength": 1
+              },
+              "classification": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "destination",
+        "include",
+        "overwrite"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "overleaf",
+            "complete"
+          ]
+        },
+        "figures": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/identifier"
+          }
+        },
+        "selector": {
+          "enum": [
+            "all-final-publication",
+            "all-final"
+          ]
+        },
+        "destination": {
+          "$ref": "#/$defs/path"
+        },
+        "captions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                "caption-only",
+                "complete-environment",
+                "disabled"
+              ]
+            }
+          }
+        },
+        "include": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "checksums",
+            "validation_reports",
+            "configuration_snapshot",
+            "palette_reference"
+          ],
+          "properties": {
+            "checksums": {
+              "type": "boolean"
+            },
+            "validation_reports": {
+              "type": "boolean"
+            },
+            "configuration_snapshot": {
+              "type": "boolean"
+            },
+            "palette_reference": {
+              "type": "boolean"
+            }
+          }
+        },
+        "overwrite": {
+          "type": "boolean"
+        },
+        "compilation_check": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "enabled",
+            "mode"
+          ],
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "mode": {
+              "enum": [
+                "project-template",
+                "minimal-document",
+                "disabled"
+              ]
+            }
+          }
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "figures"
+          ],
+          "not": {
+            "required": [
+              "selector"
+            ]
+          }
+        },
+        {
+          "required": [
+            "selector"
+          ],
+          "not": {
+            "required": [
+              "figures"
+            ]
+          }
+        }
+      ]
+    },
+    "symbolicName": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]*$"
+    }
+  }
+}

@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.0.0",
+  "article": {
+    "title": "DEGA: A Deterministic Diagnostic Evidence Governance Agent for Industrial IoT—A DUDU-BLDC Case Study",
+    "manuscript_version": "July 15, 2026 manuscript version",
+    "journal": "Information",
+    "status": "submitted manuscript version supplied by the repository author",
+    "source_pdf_filename": "MDPI_Edge_agents_for_DUDU_BLDC (1)(1).pdf",
+    "source_pdf_sha256": "c05df6d1a63b1d459b8310cea7fbf456a510926544234a0b92231176df404022",
+    "source_pdf_included_in_repository": false,
+    "authors": [
+      "Waldemar Bauer",
+      "Kacper Jarzyna",
+      "Agnieszka Piątek",
+      "Miłosz Ziemba",
+      "Jerzy Baranowski"
+    ],
+    "dataset": {
+      "name": "DUDU-BLDC",
+      "zenodo_record_id": "15522163",
+      "doi": "10.5281/zenodo.15522163"
+    }
+  },
+  "source_repository_commit": "a6887b14c1630cca44d455f14e4b05c79be7097d",
+  "data_contract": {
+    "raw_acquisitions": 8,
+    "classes": 4,
+    "acquisitions_per_class": 2,
+    "canonical_windows": 200,
+    "windows_per_acquisition": 25,
+    "window_duration_seconds": 0.8,
+    "samples_per_window": 40000,
+    "sampling_frequency_hz": 50000,
+    "features_per_window": 28,
+    "assignment_views": 16
+  },
+  "classifier_contract": {
+    "models": 48,
+    "reload_verified_models": 48,
+    "held_out_window_predictions": 4800,
+    "acquisition_predictions": 192,
+    "mean_acquisition_macro_f1": {
+      "logistic_regression": 0.875,
+      "random_forest": 0.667,
+      "hist_gradient_boosting": 0.667
+    }
+  },
+  "evidence_contract": {
+    "deviation_scorers": 16,
+    "held_out_deviation_records": 1600,
+    "training_only_healthy_references": 16,
+    "held_out_healthy_contamination": 0,
+    "trend_evidence_records": 256,
+    "window_evidence_records": 4800,
+    "acquisition_evidence_records": 192,
+    "risk_evidence_records": 768,
+    "safety_evidence_projections": 768,
+    "complete_evidence_bundles": 768
+  },
+  "xai_contract": {
+    "global_primary_assignment": "A00",
+    "global_primary_classifier": "random_forest",
+    "permutation_repeats": 30,
+    "mean_top10_jaccard": 0.318,
+    "local_lr_reconstruction_residual": 4.44e-16
+  },
+  "dega_contract": {
+    "representative_runs": 12,
+    "scenario_labels": 3,
+    "distinct_underlying_evidence_bundles_for_scenarios": 2,
+    "transition_policies": 4,
+    "escalations": 3,
+    "no_decision_outcomes": 9,
+    "recommendations": 0,
+    "safetyguard_overrides": 3,
+    "valid_audit_chains": 12,
+    "deterministic_replays": 12
+  },
+  "interpretation_limits": [
+    "The eight raw acquisitions are the independent source units.",
+    "The 200 windows are correlated observations nested within acquisitions.",
+    "The 16 assignment views are dependent exhaustive views, not independent datasets.",
+    "Classifier probabilities are model-native and uncalibrated.",
+    "Training-distribution deviation is an OOD surrogate, not a validated open-world probability.",
+    "Temporal spline derivatives are with respect to ordered window position, not physical degradation time.",
+    "No failure onset, remaining useful life, production readiness, or industrial safety certification is established."
+  ]
+}
