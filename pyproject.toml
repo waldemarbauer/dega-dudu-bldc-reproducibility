@@ -2,6 +2,8 @@
 name = "trustworthy-agent"
 version = "0.1.0"
 description = "Reproduction code for the DEGA DUDU-BLDC case study."
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
 dependencies = [
@@ -13,6 +15,7 @@ dependencies = [
     "scikit-learn>=1.9.0",
     "scipy>=1.17.1",
 ]
+
 
 [build-system]
 requires = ["hatchling>=1.25,<2"]
